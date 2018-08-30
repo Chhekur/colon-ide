@@ -1,0 +1,489 @@
+.file-list, .file-list ul{
+    font-family: system-ui;
+    list-style-type: none;
+    font-size:1em;
+    line-height:1.1em;
+    /*margin-left:20px;*/
+    padding-left:5px;
+    /*border-left:1px dotted #aaa;*/
+}
+.file-list li{
+    font-family: system-ui;
+    position: relative;
+    padding-left:15px;
+}
+.file-list li a{
+    text-decoration: none;
+    color:#9da5b4;  
+}
+.file-list li a : hover{
+    background-color: blue;
+    color:white;
+}
+.file-list li a:before{
+    display:block;
+    content: " ";
+    width:10px;
+    height:1px;
+    position:absolute;
+    /*border-bottom:1px dotted #aaa;*/
+    top:.6em;
+    left:-15px;
+}
+.file-list li:before{
+    list-style-type: none;
+    font-family: FontAwesome;
+    display:block;
+    content: "";
+    background-image: url("../icons/document.svg");
+    /*content:'\f0f6';*/
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position-x : inherit;
+    background-position-y : bottom;
+    position:absolute;
+    top:0px;
+    left:0px;
+    width:20px;
+    height:20px;
+    font-size:0.8em;
+    color:#9da5b4;
+
+}
+
+.file-list .folder-root{
+    list-style-type: none;
+}
+.file-list .folder-root a{
+    text-decoration:none;
+}
+.file-list .folder-root:before{
+    color:#9da5b4;
+    background-image: url('../icons/folder-public.svg');
+    content: "";
+    background-position-y : center;
+    /*content: url('../icons/folder-public.svg');*/
+    /*content: "\f07b";*/
+}
+.file-list .folder-root.open:before{
+    /*content: url('../icons/folder-public-open.svg');*/
+    content: "";
+    background-image: url('../icons/folder-public-open.svg');
+    background-position-y : center;
+    /*content: "\f07c";*/
+}
+li.folder-root ul{
+    transition: all .3s ease-in-out;
+    overflow:hidden;
+}
+li.folder-root.closed>ul{
+   opacity:0;
+   max-height:0px;
+}
+li.folder-root.open>ul{
+   opacity:1;
+   display:block;
+   /*max-height:1000px;*/
+}
+
+.file-list li[data-extension $= ".chek"]:before{
+    content: "";
+    background-image: url('../icons/lock.svg');
+}
+
+.file-list li[data-extension $= ".js"]:before{
+    content: "";
+    background-image: url('../icons/javascript.svg');
+
+}
+.file-list li[data-extension $= ".html"]:before{
+    content: "";
+    background-image: url('../icons/html.svg');
+
+}
+.file-list li[data-extension $= ".css"]:before{
+    content: "";
+    background-image: url('../icons/css.svg');
+
+}
+.file-list li[data-extension $= ".c"]:before{
+    content: "";
+    background-image: url('../icons/c.svg');
+
+}
+.file-list li[data-extension $= ".cpp"]:before{
+    content: "";
+    background-image: url('../icons/cpp.svg');
+
+}
+.file-list li[data-extension $= ".py"]:before{
+    content: "";
+    background-image: url('../icons/python.svg');
+
+}
+.file-list li[data-extension $= ".java"]:before{
+    content: "";
+    background-image: url('../icons/java.svg');
+}
+.file-list li[data-extension $= ".class"]:before{
+    content: "";
+    background-image: url('../icons/java.svg');
+}
+.file-list li[data-extension $= ".json"]:before{
+    content: "";
+    background-image: url('../icons/json.svg');
+
+}
+.file-list li[data-extension $= ".cs"]:before{
+    content: "";
+    background-image: url('../icons/csharp.svg');
+
+}
+.file-list li[data-extension $= ".md"]:before{
+    content: "";
+    background-image: url('../icons/markdown.svg');
+
+}
+.file-list li[data-extension $= ".db"]:before{
+    content: "";
+    background-image: url('../icons/database.svg');
+}
+.file-list li[data-extension $= ".sql"]:before{
+    content: "";
+    background-image: url('../icons/database.svg');
+}
+.file-list li[data-extension $= ".php"]:before{
+    content: "";
+    background-image: url('../icons/php.svg');
+}
+
+.file-list li[data-extension $= ".as"]:before{
+    content: "";
+    background-image: url('../icons/actionscript.svg');
+}
+
+.file-list li[data-extension $= ".scpt"]:before{
+    content: "";
+    background-image: url('../icons/applescript.svg');
+}
+
+.file-list li[data-extension $= ".asm"]:before{
+    content: "";
+    background-image: url('../icons/assembly.svg');
+}
+
+.file-list li[data-extension $= ".wav"]:before{
+    content: "";
+    background-image: url('../icons/audio.svg');
+}
+.file-list li[data-extension $= ".mp3"]:before{
+    content: "";
+    background-image: url('../icons/audio.svg');
+}
+.file-list li[data-extension $= ".ahk"]:before{
+    content: "";
+    background-image: url('../icons/autohotkey.svg');
+}
+.file-list li[data-extension $= ".au3"]:before{
+    content: "";
+    background-image: url('../icons/autoit.svg');
+}
+.file-list li[data-extension $= ".cabal"]:before{
+    content: "";
+    background-image: url('../icons/cabal.svg');
+}
+.file-list li[data-extension $= ".cake"]:before{
+    content: "";
+    background-image: url('../icons/cake.svg');
+}
+.file-list li[data-extension $= ".clj"]:before{
+    content: "";
+    background-image: url('../icons/clojure.svg');
+}
+.file-list li[data-extension $= ".coffee"]:before{
+    content: "";
+    background-image: url('../icons/coffee.svg');
+}
+.file-list li[data-extension $= ".cfm"]:before{
+    content: "";
+    background-image: url('../icons/codefusion.svg');
+}
+.file-list li[data-extension $= ".rpt"]:before{
+    content: "";
+    background-image: url('../icons/crystal.svg');
+}
+.file-list li[data-extension $= ".css.map"]:before{
+    content: "";
+    background-image: url('../icons/css-map.svg');
+}
+.file-list li[data-extension $= ".feature"]:before{
+    content: "";
+    background-image: url('../icons/cucumber.svg');
+}
+.file-list li[data-extension $= ".cu"]:before{
+    content: "";
+    background-image: url('../icons/cuda.svg');
+}
+.file-list li[data-extension $= ".d"]:before{
+    content: "";
+    background-image: url('../icons/d.svg');
+}
+.file-list li[data-extension $= ".dart"]:before{
+    content: "";
+    background-image: url('../icons/dart.svg');
+}
+.file-list li[data-extension $= "Dockerfile"]:before{
+    content: "";
+    background-image: url('../icons/docker.svg');
+}
+.file-list li[data-extension $= ".ejs"]:before{
+    content: "";
+    background-image: url('../icons/ejs.svg');
+}
+.file-list li[data-extension $= ".exs"]:before{
+    content: "";
+    background-image: url('../icons/elixir.svg');
+}
+.file-list li[data-extension $= ".erl"]:before{
+    content: "";
+    background-image: url('../icons/erlang.svg');
+}
+.file-list li[data-extension $= ".exe"]:before{
+    content: "";
+    background-image: url('../icons/exe.svg');
+}
+.file-list li[data-extension $= ".fla"]:before{
+    content: "";
+    background-image: url('../icons/flash.svg');
+}
+.file-list li[data-extension $= ".swf"]:before{
+    content: "";
+    background-image: url('../icons/flash.svg');
+}
+.file-list li[data-extension $= ".flow"]:before{
+    content: "";
+    background-image: url('../icons/flow.svg');
+}
+.file-list li[data-extension $= ".ttf"]:before{
+    content: "";
+    background-image: url('../icons/font.svg');
+}
+.file-list li[data-extension $= ".fs"]:before{
+    content: "";
+    background-image: url('../icons/fsharp.svg');
+}
+.file-list li[data-extension $= ".git"]:before{
+    content: "";
+    background-image: url('../icons/git.svg');
+}
+.file-list li[data-extension $= ".go"]:before{
+    content: "";
+    background-image: url('../icons/go.svg');
+}
+.file-list li[data-extension $= ".graphql"]:before{
+    content: "";
+    background-image: url('../icons/graphql.svg');
+}
+.file-list li[data-extension $= ".groovy"]:before{
+    content: "";
+    background-image: url('../icons/groovy.svg');
+}
+.file-list li[data-extension $= ".h"]:before{
+    content: "";
+    background-image: url('../icons/h.svg');
+}
+.file-list li[data-extension $= ".hbs"]:before{
+    content: "";
+    background-image: url('../icons/hanlebars.svg');
+}
+.file-list li[data-extension $= ".handlebars"]:before{
+    content: "";
+    background-image: url('../icons/handlebars.svg');
+}
+.file-list li[data-extension $= ".hs"]:before{
+    content: "";
+    background-image: url('../icons/haskell.svg');
+}
+.file-list li[data-extension $= ".lhs"]:before{
+    content: "";
+    background-image: url('../icons/haskell.svg');
+}
+.file-list li[data-extension $= ".hx"]:before{
+    content: "";
+    background-image: url('../icons/haxe.svg');
+}
+.file-list li[data-extension $= ".hpp"]:before{
+    content: "";
+    background-image: url('../icons/hpp.svg');
+}
+.file-list li[data-extension $= ".jpg"]:before{
+    content: "";
+    background-image: url('../icons/image.svg');
+}
+.file-list li[data-extension $= ".jpeg"]:before{
+    content: "";
+    background-image: url('../icons/image.svg');
+}
+.file-list li[data-extension $= ".png"]:before{
+    content: "";
+    background-image: url('../icons/image.svg');
+}
+.file-list li[data-extension $= ".gif"]:before{
+    content: "";
+    background-image: url('../icons/image.svg');
+}
+.file-list li[data-extension $= ".tiff"]:before{
+    content: "";
+    background-image: url('../icons/image.svg');
+}
+.file-list li[data-extension $= ".js.map"]:before{
+    content: "";
+    background-image: url('../icons/javascript-map.svg');
+}
+.file-list li[data-extension $= ".jinja"]:before{
+    content: "";
+    background-image: url('../icons/jinja.svg');
+}
+.file-list li[data-extension $= ".jl"]:before{
+    content: "";
+    background-image: url('../icons/julia.svg');
+}
+.file-list li[data-extension $= ".key"]:before{
+    content: "";
+    background-image: url('../icons/key.svg');
+}
+.file-list li[data-extension $= ".kv"]:before{
+    content: "";
+    background-image: url('../icons/kivy.svg');
+}
+.file-list li[data-extension $= ".kl"]:before{
+    content: "";
+    background-image: url('../icons/kl.svg');
+}
+.file-list li[data-extension $= ".kt"]:before{
+    content: "";
+    background-image: url('../icons/kotlin.svg');
+}
+.file-list li[data-extension $= ".less"]:before{
+    content: "";
+    background-image: url('../icons/less.svg');
+}
+.file-list li[data-extension $= ".lock"]:before{
+    content: "";
+    background-image: url('../icons/lock.svg');
+}
+.file-list li[data-extension $= ".lua"]:before{
+    content: "";
+    background-image: url('../icons/lua.svg');
+}
+.file-list li[data-extension $= ".marko"]:before{
+    content: "";
+    background-image: url('../icons/markojs.svg');
+}
+.file-list li[data-extension $= ".mdx"]:before{
+    content: "";
+    background-image: url('../icons/mdx.svg');
+}
+.file-list li[data-extension $= ".merlin"]:before{
+    content: "";
+    background-image: url('../icons/merlin.svg');
+}
+.file-list li[data-extension $= ".mxml"]:before{
+    content: "";
+    background-image: url('../icons/mxml.svg');
+}
+.file-list li[data-extension $= ".pdf"]:before{
+    content: "";
+    background-image: url('../icons/pdf.svg');
+}
+.file-list li[data-extension $= ".pl"]:before{
+    content: "";
+    background-image: url('../icons/perl.svg');
+}
+.file-list li[data-extension $= ".pug"]:before{
+    content: "";
+    background-image: url('../icons/pug.svg');
+}
+.file-list li[data-extension $= ".pp"]:before{
+    content: "";
+    background-image: url('../icons/puppet.svg');
+}
+.file-list li[data-extension $= ".purs"]:before{
+    content: "";
+    background-image: url('../icons/purescript.svg');
+}
+.file-list li[data-extension $= ".r"]:before{
+    content: "";
+    background-image: url('../icons/r.svg');
+}
+.file-list li[data-extension $= ".rkt"]:before{
+    content: "";
+    background-image: url('../icons/racket.svg');
+}
+.file-list li[data-extension $= ".jsx"]:before{
+    content: "";
+    background-image: url('../icons/react.svg');
+}
+.file-list li[data-extension $= "readme"]:before{
+    content: "";
+    background-image: url('../icons/readme.svg');
+}
+.file-list li[data-extension $= ".robot"]:before{
+    content: "";
+    background-image: url('../icons/robot.svg');
+}
+.file-list li[data-extension $= ".rb"]:before{
+    content: "";
+    background-image: url('../icons/ruby.svg');
+}
+.file-list li[data-extension $= ".rs"]:before{
+    content: "";
+    background-image: url('../icons/rust.svg');
+}
+.file-list li[data-extension $= ".san"]:before{
+    content: "";
+    background-image: url('../icons/san.svg');
+}
+.file-list li[data-extension $= ".scss"]:before{
+    content: "";
+    background-image: url('../icons/sass.svg');
+}
+.file-list li[data-extension $= ".swift"]:before{
+    content: "";
+    background-image: url('../icons/swift.svg');
+}
+.file-list li[data-extension $= ".ts"]:before{
+    content: "";
+    background-image: url('../icons/typescript.svg');
+}
+.file-list li[data-extension $= ".vue"]:before{
+    content: "";
+    background-image: url('../icons/vue.svg');
+}
+.file-list li[data-extension $= ".docx"]:before{
+    content: "";
+    background-image: url('../icons/word.svg');
+}
+.file-list li[data-extension $= ".xaml"]:before{
+    content: "";
+    background-image: url('../icons/xaml.svg');
+}
+.file-list li[data-extension $= ".xml"]:before{
+    content: "";
+    background-image: url('../icons/xml.svg');
+}
+.file-list li[data-extension $= ".yarn"]:before{
+    content: "";
+    background-image: url('../icons/yarn.svg');
+}
+.file-list li[data-extension $= ".zip"]:before{
+    content: "";
+    background-image: url('../icons/zip.svg');
+}
+.file-list li[data-extension $= ".doc"]:before{
+    content: "";
+    background-image: url('../icons/document.svg');
+}
+
+
+

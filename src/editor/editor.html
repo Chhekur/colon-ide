@@ -1,0 +1,109 @@
+<html>
+	<head>
+		<link rel=stylesheet href="lib/codemirror.css">
+		<link rel="stylesheet" href="theme/monokai.css">
+		<link rel="stylesheet" href="addon/hint/show-hint.css">
+		<link rel="stylesheet" href="addon/fold/foldgutter.css" />
+		<link rel="stylesheet" href="addon/dialog/dialog.css">
+		<link rel="stylesheet" href="addon/search/matchesonscrollbar.css">
+		<link rel="stylesheet" href="addon/scroll/simplescrollbars.css">
+		<script src = "lib/codemirror.js"></script>
+		<script src = "mode/javascript/javascript.js"></script>
+		<script src="addon/fold/foldcode.js"></script>
+		<script src="addon/fold/foldgutter.js"></script>
+		<script src="addon/fold/brace-fold.js"></script>
+		<script src="addon/fold/xml-fold.js"></script>
+		<script src="addon/fold/indent-fold.js"></script>
+		<script src="addon/fold/markdown-fold.js"></script>
+		<script src="addon/fold/comment-fold.js"></script>
+		<script src="addon/selection/active-line.js"></script>
+		<script src="addon/hint/javascript-hint.js"></script>
+		<script src="addon/mode/multiplex.js"></script>
+		<script src="addon/hint/show-hint.js"></script>
+		<script src="addon/edit/closebrackets.js"></script>
+		<script src="addon/edit/closetag.js"></script>
+		<script src="addon/dialog/dialog.js"></script>
+		<script src="addon/scroll/annotatescrollbar.js"></script>
+		<script src="addon/search/matchesonscrollbar.js"></script>
+		<script src="addon/search/searchcursor.js"></script>
+		<script src="addon/search/search.js"></script>
+		<script src="addon/search/match-highlighter.js"></script>
+		<script src="addon/search/jump-to-line.js"></script>
+		<script src="addon/scroll/simplescrollbars.js"></script>
+		<script src="addon/edit/trailingspace.js"></script>
+		<script src="keymap/sublime.js"></script>
+		<script src="mode/javascript/javascript.js"></script>
+
+	</head>
+	<style type=text/css>
+		.CodeMirror {float: left; width: 100%; height: 100%; }
+		.cm-matchhighlight {
+			border:1px solid #eee;
+			border-radius: 3px;
+		}
+		.CodeMirror-selection-highlight-scrollbar {
+			background-color: #eee;
+		}
+		.cm-tab {
+	         background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAABCAYAAADJsB7sAAAAEElEQVR42mNU11D6zzAAAACqCQFyB4r58gAAAABJRU5ErkJggg==);
+	         background-position: right;
+	         background-repeat: no-repeat;
+	      }
+	      .cm-trailingspace {
+	        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==);
+	        background-position: bottom left;
+	        background-repeat: repeat-x;
+	      }
+    </style>  
+	<style type="text/css">
+		body{
+			margin: 0px;
+		}
+		#editor{
+			padding: 1px; 
+			position: absolute; 
+			margin: 0px;
+			left: 0px; 
+			right: 0px; 
+			top: 0px; 
+			bottom: 0px; 
+			width: auto; 
+			height: auto; 
+		}
+	</style>
+	<body>
+		<textarea id = "editor" name = "editor">function hello(){
+  return something;
+}</textarea>
+	</body>
+	<script>
+		var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+			lineNumbers: true,
+			theme: "monokai",
+			styleActiveLine: true,
+			keyMap: "sublime",
+			lineWrapping: true,
+			foldGutter: true,
+			autoCloseBrackets: true,
+			autoCloseTags: true,
+			showTrailingSpace: true,
+			gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+			extraKeys: {"Ctrl-Space": "autocomplete","Ctrl-Q": function(cm){ cm.foldCode(cm.getCursor()); }},
+			highlightSelectionMatches: {annotateScrollbar: true},
+			// hintOptions: {hint: synonyms},
+			scrollbarStyle: "simple",
+			mode: {name: "javascript", globalVars: true},
+			tabSize: 4,
+	        indentUnit: 4,
+	        indentWithTabs: true
+		});
+		// editor.foldCode(CodeMirror.Pos(13, 0));
+		editor.on("keyup", function (cm, event) {
+			console.log(event);
+	        if (!cm.state.completionActive && event.keyCode != 13 && event.keyCode != 9 && event.keyCode != 16 && event.keyCode != 37 && event.keyCode != 38 && event.keyCode != 39 && event.keyCode != 40 && event.keyCode != 219 && event.keyCode != 221 && event.keyCode != 57 && event.keyCode != 48 && event.keyCode != 186 && event.keyCode != 27 && event.keyCode != 8 && event.keyCode != 32) {
+	        	console.log('Hello');
+	            CodeMirror.commands.autocomplete(cm, null, {completeSingle: false});
+	        }
+	    });
+	</script>
+</html>

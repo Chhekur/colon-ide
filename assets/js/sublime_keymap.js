@@ -1,0 +1,117 @@
+ipc.on('toggleCommentIndented',function(event){
+	CodeMirror.commands.toggleCommentIndented(editor);
+})
+ipc.on('Indent',function(event){
+	CodeMirror.commands.Indent(editor);
+})
+ipc.on('indentLess',function(event){
+	CodeMirror.commands.indentLess(editor);
+})
+ipc.on('swapLineUp',function(event){
+	CodeMirror.commands.swapLineUp(editor);
+})
+ipc.on('swapLineDown',function(event){
+	CodeMirror.commands.swapLineDown(editor);
+})
+ipc.on('duplicateLine',function(event){
+	CodeMirror.commands.duplicateLine(editor);
+})
+ipc.on('deleteLine',function(event){
+	CodeMirror.commands.deleteLine(editor);
+})
+ipc.on('joinLines',function(event){
+	CodeMirror.commands.joinLines(editor);
+})
+ipc.on('insertLineBefore',function(event){
+	CodeMirror.commands.insertLineBefore(editor);
+})
+ipc.on('insertLineAfter',function(event){
+	CodeMirror.commands.insertLineAfter(editor);
+})
+ipc.on('transposeChars',function(event){
+	CodeMirror.commands.transposeChars(editor);
+})
+ipc.on('setSublimeMark',function(event){
+	CodeMirror.commands.setSublimeMark(editor);
+})
+ipc.on('selectToSublimeMark',function(event){
+	CodeMirror.commands.selectToSublimeMark(editor);
+})
+ipc.on('deleteToSublimeMark',function(event){
+	CodeMirror.commands.deleteToSublimeMark(editor);
+})
+ipc.on('swapWithSublimeMark',function(event){
+	CodeMirror.commands.swapWithSublimeMark(editor);
+})
+ipc.on('clearSublimeMark',function(event){
+	CodeMirror.commands.clearSublimeMark(editor);
+})
+ipc.on('fold',function(event){
+	CodeMirror.commands.fold(editor);
+})
+ipc.on('unflod',function(event){
+	CodeMirror.commands.unflod(editor);
+})
+ipc.on('upcaseAtCursor',function(event){
+	CodeMirror.commands.upcaseAtCursor(editor);
+})
+ipc.on('downcaseAtCursor',function(event){
+	CodeMirror.commands.downcaseAtCursor(editor);
+})
+ipc.on('wrapLines',function(event){
+	CodeMirror.commands.wrapLines(editor);
+})
+ipc.on('sortLines',function(event){
+	CodeMirror.commands.sortLines(editor);
+})
+ipc.on('sortLinesInsensitive',function(event){
+	CodeMirror.commands.sortLinesInsensitive(editor);
+})
+ipc.on('splitSelectionByLine',function(event){
+	CodeMirror.commands.splitSelectionByLine(editor);
+})
+ipc.on('addCursorToPrevLine',function(event){
+	CodeMirror.commands.addCursorToPrevLine(editor);
+})
+ipc.on('addCursorToNextLine',function(event){
+	CodeMirror.commands.addCursorToNextLine(editor);
+})
+ipc.on('singleSelectionTop',function(event){
+	CodeMirror.commands.singleSelectionTop(editor);
+})
+ipc.on('find',function(event){
+	CodeMirror.commands.find(editor);
+})
+ipc.on('findNext',function(event){
+	CodeMirror.commands.findNext(editor);
+})
+ipc.on('findPrev',function(event){
+	CodeMirror.commands.findPrev(editor);
+})
+ipc.on('findIncremental',function(event){
+	CodeMirror.commands.findIncremental(editor);
+})
+ipc.on('findIncrementalReverse',function(event){
+	CodeMirror.commands.findIncrementalReverse(editor);
+})
+ipc.on('replace',function(event){
+	CodeMirror.commands.replace(editor);
+})
+ipc.on('findUnder',function(event){
+	CodeMirror.commands.findUnder(editor);
+})
+ipc.on('selectNextOccurrence',function(event){
+	CodeMirror.commands.selectNextOccurrence(editor);
+})
+ipc.on('goSubwordLeft',function(event){
+	CodeMirror.commands.goSubwordLeft(editor);
+})
+ipc.on('goSubwordRight',function(event){
+	CodeMirror.commands.goSubwordRight(editor);
+})
+ipc.on('jumpToLine',function(event){
+	CodeMirror.commands.jumpToLine(editor);
+})
+ipc.on('goToBracket',function(event){
+	CodeMirror.commands.goToBracket(editor);
+})

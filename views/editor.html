@@ -1,0 +1,106 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="../src/editor/lib/codemirror.css">
+		<link rel="stylesheet" href="../src/editor/theme/one-dark.css">
+		<link rel="stylesheet" href="../src/editor/addon/hint/show-hint.css">
+		<link rel="stylesheet" href="../src/editor/addon/fold/foldgutter.css" />
+		<link rel="stylesheet" href="../src/editor/addon/dialog/dialog.css">
+		<link rel="stylesheet" href="../src/editor/addon/search/matchesonscrollbar.css">
+		<link rel="stylesheet" href="../src/editor/addon/scroll/simplescrollbars.css">
+		<link rel="stylesheet" href="../assets/css/editor.css">
+		<link href="../assets/css/file-explore.css" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="../assets/css/font-awesome.min.css">
+		<link rel="stylesheet" href="../assets/css/bootstrap.css">
+		<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+		<script src = "../src/editor/lib/codemirror.js"></script>
+		<!-- <script src = "../src/editor/mode/javascript/javascript.js"></script> -->
+		<script src="../src/editor/addon/fold/foldcode.js"></script>
+		<script src="../src/editor/addon/fold/foldgutter.js"></script>
+		<script src="../src/editor/addon/fold/brace-fold.js"></script>
+		<script src="../src/editor/addon/fold/xml-fold.js"></script>
+		<script src="../src/editor/addon/fold/indent-fold.js"></script>
+		<script src="../src/editor/addon/fold/markdown-fold.js"></script>
+		<script src="../src/editor/addon/fold/comment-fold.js"></script>
+		<script src="../src/editor/addon/selection/active-line.js"></script>
+		<script src="../src/editor/addon/hint/javascript-hint.js"></script>
+		<script src="../src/editor/addon/hint/html-hint.js"></script>
+		<script src="../src/editor/addon/hint/css-hint.js"></script>
+		<script src="../src/editor/addon/hint/sql-hint.js"></script>
+		<script src="../src/editor/addon/hint/autosuggest.js"></script>
+		<script src="../src/editor/addon/hint/xml-hint.js"></script>
+		<script src="../src/editor/addon/mode/multiplex.js"></script>
+		<script src="../src/editor/addon/hint/show-hint.js"></script>
+		<script src="../src/editor/addon/hint/anyword-hint.js"></script>
+		<script src="../src/editor/addon/edit/closebrackets.js"></script>
+		<script src="../src/editor/addon/edit/matchbrackets.js"></script>
+		<script src="../src/editor/addon/edit/closetag.js"></script>
+		<script src="../src/editor/addon/dialog/dialog.js"></script>
+		<script src="../src/editor/addon/comment/comment.js"></script>
+		<script src="../src/editor/addon/scroll/annotatescrollbar.js"></script>
+		<script src="../src/editor/addon/search/matchesonscrollbar.js"></script>
+		<script src="../src/editor/addon/search/searchcursor.js"></script>
+		<script src="../src/editor/addon/search/search.js"></script>
+		<script src="../src/editor/addon/search/match-highlighter.js"></script>
+		<script src="../src/editor/addon/search/jump-to-line.js"></script>
+		<script src="../src/editor/addon/scroll/simplescrollbars.js"></script>
+		<script src="../src/editor/addon/edit/trailingspace.js"></script>
+		<script src="../src/editor/keymap/sublime.js"></script>
+		<script src="../src/editor/mode/javascript/javascript.js"></script>
+		<script src="../src/editor/addon/mode/loadmode.js"></script>
+		<script src="../src/editor/mode/meta.js"></script>
+		<script src="../src/editor/addon/display/panel.js"></script>
+		<script>
+		    window.jQuery = window.$ = require('../assets/js/jquery.js');
+		</script>
+		<script src="../assets/js/bootstrap.min.js"></script>
+		<!-- <script src="../menu/functions.js"></script> -->
+	</head>
+	<body>
+		<div class="panel-container">
+            <div class="panel-left column">
+            </div>
+            <div class="splitter">
+            </div>
+            <div class="panel-middle" data-target = "editors">
+
+				<ul class="nav nav-tabs" id="code_mirror_editors">
+					<!-- <li class="active"><a href="" id = "filename_new1" onclick = "opentab(this)" data-target="#new1" role="tab" data-toggle="tab">Untitled</a></li> -->
+					<!-- <li><a href="" data-target="#editor2" role="tab" data-toggle="tab">Second Editor 2</a></li> -->
+				</ul>
+				<div class="tab-content" id = "editors">
+					<!-- <div class="tab-pane active" id="new1">
+						<textarea id="file_new1"></textarea>
+					</div> -->
+					<!-- <div class="tab-pane" id="editor2">
+						<textarea id="codeify_editor2">&lt;p&gt;Second editor 2&lt;/p&gt;</textarea>
+					</div> -->
+				</div>
+
+                <!-- <textarea id = "code"></textarea> -->
+            </div>
+            <div class="splitter2">
+            </div>
+            <div class="panel-right column">
+                <div class = "console-container">
+                	<div>
+                		<span class = "vertical-align-middle">Input</span>
+                		<img onclick = "run()" src = "../assets/icons/run-button.svg" width="40px;" class = "vertical-align-middle run-button"></img>
+                	</div>
+                	<textarea id = "input" class="console" ></textarea><br>
+                	<div><span>Output</span><br><br>
+                		<span id = "output" class="console"></span>
+                	</div>
+                </div>
+                <div class = "html-preview">
+                	<iframe id=preview class="html-preview"></iframe>
+                </div>
+            </div>
+        </div>
+	</body>
+	<script src = "../assets/js/jquery-resizable.js"></script>
+	<script src = "../assets/js/editor.js"></script>
+	<!-- <script src = "../assets/js/jquery.js"></script> -->
+	<script src = "../assets/js/file-explore.js"></script> 
+	<script src = "../assets/js/sublime_keymap.js"></script>
+	<!-- <script src="../menu/functions.js"></script> -->
+</html>
