@@ -18,7 +18,7 @@ Colon will automatically update when a new release is available.
 
 ### Linux
 
-Colon is only available for 64-bit Linux systems. `Colon-x86_64.AppImage` for 32bit and 64bit as well.
+Download the latest [Colon installer](https://github.com/Chhekur/colon-ide/releases/latest). `Colon-x86_64.AppImage` for 32bit and 64bit as well.
 
 ## License
 
