@@ -30,6 +30,16 @@ ipc.on('openFileFromSidebar', function(event, filepath){
 	openFileFromSidebar(filepath);
 })
 
+function openDoubleClickFile(filepath){
+	fs.readFile(filepath, 'utf-8', (err, data) => {
+        if(err){
+            return;
+        }
+        mainWindow.webContents.send('openDoubleClickFile', data, filepath);
+        // mainWindow.webContents.send('change-mod',fileNames[0]);
+    });
+}
+
 function openFile(){
 	dialog.showOpenDialog((fileNames) => {
 	    if(fileNames === undefined){
@@ -403,8 +413,30 @@ function openConsole(){
 function openHtmlPreview(){
 	mainWindow.webContents.send('openHtmlPreview');
 }
+function openProjectStructure(){
+	mainWindow.webContents.send('openProjectStructure');
+}
+function checkForUpdates(){
+	isUpdatCallFromMenu = true;
+	autoUpdater.checkForUpdates();
+}
+function increaseFontSize(){
+	mainWindow.webContents.send('increaseFontSize');
+}
+function decreaseFontSize(){
+	mainWindow.webContents.send('decreaseFontSize');
+}
+
+function openMarkdownPreview(){
+	mainWindow.webContents.send('openMarkdownPreview');
+}
+function openAbout(){
+	mainWindow.webContents.send('openAbout');
+}
+
 
 module.exports = {
+	openDoubleClickFile:openDoubleClickFile,
 	openFile : openFile,
 	openFolder : openFolder,
 	newFile : newFile,
@@ -450,5 +482,11 @@ module.exports = {
 	jumpToLine : jumpToLine,
 	goToBracket : goToBracket,
 	openConsole : openConsole,
-	openHtmlPreview : openHtmlPreview
+	openHtmlPreview : openHtmlPreview,
+	openMarkdownPreview : openMarkdownPreview,
+	openProjectStructure : openProjectStructure,
+	checkForUpdates : checkForUpdates,
+	increaseFontSize : increaseFontSize,
+	decreaseFontSize : decreaseFontSize,
+	openAbout : openAbout
 }

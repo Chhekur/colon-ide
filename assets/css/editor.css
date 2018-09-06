@@ -90,6 +90,13 @@ input, button, textarea, :focus {
 }
 
 
+.project-title{
+	font-family: system-ui;
+	font-size: 15px;
+	background-color: #282c34;
+	padding:7px;
+}
+
 /* horizontal panel*/
 
 .panel-container {
@@ -101,14 +108,36 @@ input, button, textarea, :focus {
   xtouch-action: none;
 }
 
-.panel-left {
+.side-nav {
 	overflow: auto;
 	flex: 0 0 auto;
 	/* only manually resize */
-	padding: 10px;
+	/*padding: 10px;*/
+	/*width: 150px;*/
+	/*min-height: 200px;*/
+	/*min-width: 50px;*/
+	white-space: nowrap;
+	background: #282c34;
+	color: #9da5b4;
+}
+
+.side-nav-button-active{
+	color:#bd1010;
+}
+
+#project-structure{
+	overflow: auto;
+	height: 100%;
+}
+
+.panel-left {
+	display: none;
+	/*overflow: auto;*/
+	flex: 0 0 auto;
+	/* only manually resize */
+	/*padding: 10px;*/
 	width: 150px;
 	min-height: 200px;
-	min-width: 50px;
 	white-space: nowrap;
 	background: #21252b;
 	color: #9da5b4;
@@ -173,6 +202,13 @@ input, button, textarea, :focus {
 }
 
 .html-preview{
+	display: none;
+	background: #fff;
+	width: 100%;
+	height: 100%;
+	border: none;
+}
+.markdown-preview{
 	display: none;
 	background: #fff;
 	width: 100%;

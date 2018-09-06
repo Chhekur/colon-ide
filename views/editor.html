@@ -11,6 +11,7 @@
 		<link href="../assets/css/file-explore.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="../assets/css/font-awesome.min.css">
 		<link rel="stylesheet" href="../assets/css/bootstrap.css">
+		<link rel="stylesheet" href="../assets/css/metro.css">
 		<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
 		<script src = "../src/editor/lib/codemirror.js"></script>
 		<!-- <script src = "../src/editor/mode/javascript/javascript.js"></script> -->
@@ -53,11 +54,34 @@
 		    window.jQuery = window.$ = require('../assets/js/jquery.js');
 		</script>
 		<script src="../assets/js/bootstrap.min.js"></script>
+		<!-- <script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script> -->
 		<!-- <script src="../menu/functions.js"></script> -->
 	</head>
 	<body>
 		<div class="panel-container">
+			<div class="side-nav">
+				<ul class="sidenav-simple h-auto">
+					<li><a href="#" onclick = "newFile()">
+					        <span class="icon"><i class="fa fa-files-o" aria-hidden="true"></i></span>
+					    </a></li>
+				    <li><a href="#" onclick = "openProjectStructure()">
+					        <span class="icon"><i class="fa fa-folder-o" aria-hidden="true"></i></span>
+					    </a></li>
+					     <li><a href="#" onclick = "openConsole()">
+					        <span class="icon"><i class="fa fa-terminal" aria-hidden="true"></i></span>
+					    </a></li>
+					    <li><a href="#" onclick = "openHtmlPreview()">
+					        <span class="icon"><i class="fa fa-television" aria-hidden="true"></i></span>
+					    </a></li>
+					    <li><a href="#" onclick = "openMarkdownPreview()">
+					        <span class="icon"><i class="fa fa-desktop" aria-hidden="true"></i></span>
+					    </a></li>
+				</ul>
+			</div>
             <div class="panel-left column">
+            	<div class="project-title"><center><span>Project</span></center></div>
+            	<!-- <span class = "project-title"><center>Project</center></span> -->
+            	<div id = "project-structure" ></div>
             </div>
             <div class="splitter">
             </div>
@@ -91,8 +115,12 @@
                 		<span id = "output" class="console"></span>
                 	</div>
                 </div>
+
                 <div class = "html-preview">
-                	<iframe id=preview class="html-preview"></iframe>
+                	<iframe id=html-preview class="html-preview"></iframe>
+                </div>
+                <div class = "markdown-preview">
+                	<iframe id=markdown-preview class="markdown-preview"></iframe>
                 </div>
             </div>
         </div>

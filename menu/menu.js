@@ -77,14 +77,32 @@ const template = [
 			type: 'separator'
 		},
 		{
-			label:'Font',
+			label:'Font Size',
 			submenu:[{
 				label:'Increase',
-				role:'zoomin'
+				accelerator:'CmdOrCtrl+=',
+				click:function(){
+					fun.increaseFontSize();
+				}
 			},
 			{
 				label:'Decrease',
-				role:'zoomout',
+				accelerator:'CmdOrCtrl+-',
+				click:function(){
+					fun.decreaseFontSize();
+				}
+			}]
+		},
+		{
+			label: 'Zoom',
+			submenu:[{
+				label:'In',
+				role:'zoomin'
+			},
+			{
+				label:'Out',
+				accelerator:'CmdOrCtrl+Shift+-',
+				role:'zoomout'
 			}]
 		},
 		{
@@ -415,9 +433,37 @@ const template = [
 		},
 		{
 			label:'Html Preview',
-			accelerator:'Shift+P',
+			accelerator:'CmdOrCtrl+Shift+P',
 			click:function(){
 				fun.openHtmlPreview();
+			}
+		},
+		{
+			label:'Markdown Preview',
+			accelerator:'CmdOrCtrl+Alt+P',
+			click:function(){
+				fun.openMarkdownPreview();
+			}
+		},
+		{
+			label : 'Project Structure',
+			click:function(){
+				fun.openProjectStructure();
+			}
+		}]
+	},
+	{
+		label: 'Help',
+		submenu: [{
+			label: 'Check For Updates...',
+			click:function(){
+				fun.checkForUpdates();
+			}
+		},
+		{
+			label:'About Colon',
+			click:function(){
+				fun.openAbout();
 			}
 		}]
 	}

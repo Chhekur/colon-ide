@@ -1,6 +1,9 @@
 const ipc = require('electron').ipcRenderer;
 const {dialog} = require('electron').remote;
 window.$ = window.jQuery = require('../assets/js/jquery.js');
+const showdown  = require('showdown');
+const fs = require('fs');
+const markdown_converter = new showdown.Converter();
 const path = require('path');
 var files = {};
 var newFileCount = 1;
@@ -47,9 +50,18 @@ function initEditor(editor_id){
 // auto mod selector
 // var editor = "";
 CodeMirror.modeURL = "../src/editor/mode/%N/%N.js";
+// var editor = "";
+// var file = "";
 var editor = newTab(undefined , newFileCount , 'untitled', '');
 var file = files['#new' + newFileCount];
 $('#filename_new1').click();
+
+ipc.on('openDoubleClickFile', function(event,data,filepath){
+	// console.log(data,filepath);
+	editor.setValue(data);
+	file.path = filepath;
+	file.name = path.basename(filepath);
+});
 // var editor = initEditor(document.getElementById('file_new1'));
 // addPanel('bottom',editor, 'new1');
 // files['#new'+newFileCount] = {
@@ -82,6 +94,12 @@ function newTab(filepath, filecount ,filename, data){
 		id: file_id,
 		editor: temp
 	}
+	temp.on("change", function() {
+		closeToDot();
+		// clearTimeout(delay);
+		setTimeout(updateHtmlPreview, 300);
+		setTimeout(updateMarkdownPreview,300);
+	});
 	// console.log(data);
 	
 	// return editor;
@@ -90,6 +108,7 @@ function newTab(filepath, filecount ,filename, data){
 ipc.on('openFile',function(event, data, filepath){
 	newFileCount++;
 	newTab(filepath, newFileCount ,path.basename(filepath),data);
+	$('#filename_new'+newFileCount).click();
 	// files['#'+filepath] = {
 	// 	path: filepath,
 	// 	name: path.basename(filepath),
@@ -150,8 +169,9 @@ ipc.on('openFolder', function(event,structure){
 	let response = '<ul class="file-tree"><li><a href="#"><span class = "label">' + structure.name + '</span></a><ul>';
 	response += makeDirectoryTree(structure.children);
 	response += '</ul>';
-	$('.panel-left').html(response);
+	$('#project-structure').html(response);
 	$(".file-tree").filetree();
+	openProjectStructure(true);
 });
 
 // create tree structure for opened folder
@@ -175,22 +195,32 @@ function openFileFromSidebar(file){
 	ipc.send('openFileFromSidebar', filepath);
 }
 
-ipc.on('newFile',function(event){
+// new File
+function newFile(){
 	newFileCount ++;
 	newTab(undefined , newFileCount , 'untitled', '');
+	$('#filename_new'+newFileCount).click();
+}
+
+ipc.on('newFile',function(event){
+	newFile();
 	// editor.getDoc().setValue('');
 })
 
 ipc.on('saveAs', function(event){
-	var data = editor.getValue();
-	// console.log(data);
-	ipc.send('saveAs-data', data);
+	if(editor != undefined){
+		var data = editor.getValue();
+		// console.log(data);
+		ipc.send('saveAs-data', data);
+	}
 })
 
 ipc.on('save', function(event){
-	var data = editor.getValue();
-	// console.log(data);
-	ipc.send('save-data', data, file.path);
+	if(editor != undefined){
+		var data = editor.getValue();
+		// console.log(data);
+		ipc.send('save-data', data, file.path);
+	}
 });
 
 ipc.on('data-saved',function(event,filepath){
@@ -277,19 +307,21 @@ function addPanel(where,editor,file_id) {
 // check where curson is and what is the current mod of editor
 
 setInterval(function(){
-	line = editor.getCursor().line;
-	column = editor.getCursor().ch;
-	$('#filename_' + file['id']).html(file.name);
-	$('#footer_' + file['id'] ).find('#line').html(line + 1);
-	$('#footer_' + file['id'] ).find('#column').html(column + 1);
-	// document.getElementById('line').innerHTML = line + 1;
-	// document.getElementById('column').innerHTML = column + 1;
-	let temp = editor.options.mode.split('/')[1];
-	if(temp.indexOf('-') > -1){
-		temp = temp.split('-')[1];
+	if(editor != undefined){
+		line = editor.getCursor().line;
+		column = editor.getCursor().ch;
+		$('#filename_' + file['id']).html(file.name);
+		$('#footer_' + file['id'] ).find('#line').html(line + 1);
+		$('#footer_' + file['id'] ).find('#column').html(column + 1);
+		// document.getElementById('line').innerHTML = line + 1;
+		// document.getElementById('column').innerHTML = column + 1;
+		let temp = editor.options.mode.split('/')[1];
+		if(temp.indexOf('-') > -1){
+			temp = temp.split('-')[1];
+		}
+		$('#footer_' + file['id'] ).find('#mode').html(temp);
+		// document.getElementById('mode').innerHTML = temp ;
 	}
-	$('#footer_' + file['id'] ).find('#mode').html(temp);
-	// document.getElementById('mode').innerHTML = temp ;
 },100);
 
 // trigger left side-bar 
@@ -342,21 +374,110 @@ ipc.on('error', function(event, message){
 });
 
 
+// open about page
+
+ipc.on('openAbout', function(event){
+	// console.log('jello');
+	newFileCount++;
+	let file_id = "new" + newFileCount;
+	fs.readFile('views/about.html', function(err,data){
+		if(err) console.log(err);
+		$('#code_mirror_editors').append('<li id = "file_tab_'+file_id+'"><a href="" data-target="#' + file_id + '" role="tab" data-toggle="tab"><span id = "filename_'+file_id+'" onclick = "opentab(this)">' + 'About' + '</span><span onclick = "closeAnyFile(this)" class="close black"></span></a></li>');
+		$('#editors').append('<div class="tab-pane" id = "'+file_id+'">'+data+'</div>');
+		files['#'+ file_id] = {
+			path: undefined,
+			name: undefined,
+			id: file_id,
+			editor: undefined
+		}
+		$('#filename_new'+newFileCount).click();
+	});
+});
+
 // open console
-ipc.on('openConsole',function(event){
-	$('.panel-middle').css('width','60%');
+function openConsole(){
+	if($('.console-container').css('display') == 'none'){
+		$('.panel-middle').css('width','60%');
+		$('.console-container').css('display','block');
+		$('.fa-terminal').addClass('side-nav-button-active');
+	}else{
+		$('.panel-middle').css('width','100%');
+		$('.console-container').css('display','none');
+		$('.fa-terminal').removeClass('side-nav-button-active');
+	}
 	$('.html-preview').css('display','none');
-	$('.console-container').css('display','block');
+	$('.fa-television').removeClass('side-nav-button-active');
+	$('.markdown-preview').css('display','none');
+	$('.fa-desktop').removeClass('side-nav-button-active');
+}
+
+ipc.on('openConsole',function(event){
+	openConsole();
 });
 
 
 // open html preview
-ipc.on('openHtmlPreview', function(event){
-	$('.panel-middle').css('width','60%');
+function openHtmlPreview(){
+	if($('.html-preview').css('display') == 'none'){
+		$('.panel-middle').css('width','60%');
+		$('.html-preview').css('display','block');
+		$('.fa-television').addClass('side-nav-button-active');
+	}else{
+		$('.panel-middle').css('width','100%');
+		$('.html-preview').css('display','none');
+		$('.fa-television').removeClass('side-nav-button-active');
+	}
 	$('.console-container').css('display','none');
-	$('.html-preview').css('display','block');
+	$('.fa-terminal').removeClass('side-nav-button-active');
+	$('.markdown-preview').css('display','none');
+	$('.fa-desktop').removeClass('side-nav-button-active');
+}
+
+ipc.on('openHtmlPreview', function(event){
+	openHtmlPreview();
 	// $('#preview').html(file.editor.getValue());
-})
+});
+
+// open markdown preview
+
+function openMarkdownPreview(){
+	if($('.markdown-preview').css('display') == 'none'){
+		$('.panel-middle').css('width','60%');
+		$('.markdown-preview').css('display','block');
+		$('.fa-desktop').addClass('side-nav-button-active');
+	}else{
+		$('.panel-middle').css('width','100%');
+		$('.markdown-preview').css('display','none');
+		$('.fa-desktop').removeClass('side-nav-button-active');
+	}
+	$('.console-container').css('display','none');
+	$('.fa-terminal').removeClass('side-nav-button-active');
+	$('.html-preview').css('display','none');
+	$('.fa-television').removeClass('side-nav-button-active');
+}
+
+ipc.on('openMarkdownPreview', function(event){
+	openMarkdownPreview();
+	// $('#preview').html(file.editor.getValue());
+});
+
+
+// open project structure
+
+function openProjectStructure(call_from_menu = false){
+	if($('.panel-left').css('display') == "none"){
+		$('.panel-left').css('display','block');
+		$('.panel-left').css('width','150px');
+		$('.fa-folder-o').addClass('side-nav-button-active');
+	}else if($('.panel-left').css('display') == "block" && call_from_menu == false){
+		$('.panel-left').css('display','none');
+		$('.fa-folder-o').removeClass('side-nav-button-active');
+	}
+}
+
+ipc.on('openProjectStructure', function(event){
+	openProjectStructure();
+});
 
 // change dot to close if file has saved
 function dotToClose(){
@@ -378,19 +499,57 @@ function closeToDot(){
 editor.on("change", function() {
 	// clearTimeout(delay);
 	closeToDot();
-	setTimeout(updatePreview, 300);
+	setTimeout(updateHtmlPreview, 300);
+	setTimeout(updateMarkdownPreview, 300);
 });
 
-function updatePreview() {
-        var previewFrame = document.getElementById('preview');
-        var preview =  previewFrame.contentDocument ||  previewFrame.contentWindow.document;
-        preview.open();
-        // console.log(editor.getValue());
-        preview.write(editor.getValue());
-        preview.close();
-      }
-setTimeout(updatePreview, 300);
+function updateHtmlPreview() {
+	if(editor != undefined){
+	    var previewFrame = document.getElementById('html-preview');
+	    var preview =  previewFrame.contentDocument ||  previewFrame.contentWindow.document;
+	    preview.open();
+	    // console.log(editor.getValue());
+	    preview.write(editor.getValue());
+	    preview.close();
+	}
+}
+function updateMarkdownPreview(){
+	if(editor != undefined){
+		var previewFrame = document.getElementById('markdown-preview');
+	    var preview =  previewFrame.contentDocument ||  previewFrame.contentWindow.document;
+		let Html = markdown_converter.makeHtml(editor.getValue());
+		preview.write('<link rel="stylesheet" href="../assets/css/md.css">');
+		preview.write(Html);
+		preview.close();
+	}
+}
 
+setTimeout(updateHtmlPreview, 300);
+setTimeout(updateMarkdownPreview, 300);
+
+// Increase or Decrease font size
+
+ipc.on('increaseFontSize', function(event){
+	increaseFontSize();
+});
+
+ipc.on('decreaseFontSize', function(event){
+	decreaseFontSize();
+});
+
+function increaseFontSize(){
+	let currentFontSize = parseInt($('.CodeMirror').css('font-size').split('px'));
+	// console.log(currentFontSize);
+	$('.CodeMirror').css('font-size',++currentFontSize);
+	editor.refresh();
+}
+
+function decreaseFontSize(){
+	let currentFontSize = parseInt($('.CodeMirror').css('font-size').split('px'));
+	// console.log(currentFontSize);
+	$('.CodeMirror').css('font-size',--currentFontSize);
+	editor.refresh();
+}
 
 // click on tab
 
@@ -398,15 +557,19 @@ function opentab(tab){
 	// console.log(tab);
 	file = files[$(tab).parent().data('target')];
 	editor = file.editor;
-	updatePreview();
-	editor.on("change", function() {
-		closeToDot();
-		// clearTimeout(delay);
-		setTimeout(updatePreview, 300);
-	});
-	setTimeout(function(){
-		editor.refresh();
-	},1);
+	updateHtmlPreview();
+	updateMarkdownPreview();
+	// editor.on("change", function() {
+	// 	closeToDot();
+	// 	// clearTimeout(delay);
+	// 	setTimeout(updateHtmlPreview, 300);
+	// 	setTimeout(updateMarkdownPreview,300);
+	// });
+	if(editor != undefined){
+		setTimeout(function(){
+			editor.refresh();
+		},1);
+	}
 }
 
 

@@ -6,7 +6,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "publish": "build --win -p always"
+    "publish": "build --win -p never"
   },
   "keywords": [],
   "license": "ISC",
@@ -17,7 +17,8 @@
   "dependencies": {
     "electron-log": "^2.2.17",
     "electron-progressbar": "^1.1.0",
-    "electron-updater": "^3.1.1"
+    "electron-updater": "^3.1.1",
+    "showdown": "^1.8.6"
   },
   "build": {
     "appId": "com.chhekur.colon",

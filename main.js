@@ -1,5 +1,5 @@
 const electron = require('electron')
-const {autoUpdater} = require("electron-updater");
+global.autoUpdater = require("electron-updater").autoUpdater;
 const log = require('electron-log');
 const dialog = require('electron').dialog;
 const ProgressBar = require('electron-progressbar');
@@ -10,7 +10,7 @@ autoUpdater.logger.transports.file.level = 'info';
 autoUpdater.autoDownload = false
 let progr = 0
 let progressBar;
-let isUpdatCallFromMenu = false;
+global.isUpdatCallFromMenu = false;
 // console.log(electron)
 // Module to control application life.
 global.app = electron.app
@@ -32,7 +32,7 @@ function createWindow () {
 		slashes: true
 	}))
 	// Open the DevTools.
-	//mainWindow.webContents.openDevTools()
+	mainWindow.webContents.openDevTools()
 	// Emitted when the window is closed.
 	mainWindow.on('closed', function () {
 		// Dereference the window object, usually you would store windows
@@ -46,9 +46,24 @@ function createWindow () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function(){
-	createWindow();
+	let promise = new Promise(function(resolve,reject){
+		createWindow();
+		setTimeout(function(){
+			resolve();
+		},500);
+	}).then(function(){
+		if(process.argv[1] != undefined){
+			// dialog.showMessageBox({
+		 //      	title:'argv',
+		 //      	message:process.argv[1].toString()
+		 //      });
+		 //      console.log(process.argv);
+      		require('./menu/functions.js').openDoubleClickFile(process.argv[1]);
+      	}
+  	});
     // autoUpdater.checkForUpdatesAndNotify();
       autoUpdater.checkForUpdates();
+      
 })
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
