@@ -2,15 +2,14 @@ const electron = require('electron')
 global.autoUpdater = require("electron-updater").autoUpdater;
 const log = require('electron-log');
 const dialog = require('electron').dialog;
-const ProgressBar = require('electron-progressbar');
 
 let updater
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 autoUpdater.autoDownload = false
-let progr = 0
-let progressBar;
-global.isUpdatCallFromMenu = false;
+// let progr = 0
+// let progressBar;
+// global.isUpdatCallFromMenu = false;
 // console.log(electron)
 // Module to control application life.
 global.app = electron.app
@@ -24,7 +23,7 @@ const url = require('url')
 global.mainWindow
 function createWindow () {
 	// Create the browser window.
-	mainWindow = new BrowserWindow({width: 800, height: 600})
+	mainWindow = new BrowserWindow({width: 800, height: 600, show:false})
 	// and load the index.html of the app.
 	mainWindow.loadURL(url.format({
 		pathname: path.join(__dirname, '/views/editor.html'),
@@ -32,7 +31,7 @@ function createWindow () {
 		slashes: true
 	}))
 	// Open the DevTools.
-	mainWindow.webContents.openDevTools()
+	// mainWindow.webContents.openDevTools()
 	// Emitted when the window is closed.
 	mainWindow.on('closed', function () {
 		// Dereference the window object, usually you would store windows
@@ -46,11 +45,26 @@ function createWindow () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function(){
+  // var splash = new BrowserWindow({
+  //   width: 600,
+  //   height: 300,
+  //   frame: false,
+  //   show:false
+  //   // resizable: false
+  // });
+  // splash.loadURL(url.format({
+  //   pathname: path.join(__dirname, '/views/about.html'),
+  //   protocol: 'file:',
+  //   slashes: true
+  // }));
+  // splash.once('ready-to-show', function(){
+  //   splash.show();
+  // });
 	let promise = new Promise(function(resolve,reject){
 		createWindow();
 		setTimeout(function(){
 			resolve();
-		},500);
+		},1000);
 	}).then(function(){
 		if(process.argv[1] != undefined){
 			// dialog.showMessageBox({
@@ -62,7 +76,11 @@ app.on('ready', function(){
       	}
   	});
     // autoUpdater.checkForUpdatesAndNotify();
-      autoUpdater.checkForUpdates();
+    mainWindow.once('ready-to-show', () => {
+      // splash.destroy();
+      mainWindow.show();
+    });
+    autoUpdater.checkForUpdates();
       
 })
 // Quit when all windows are closed.
@@ -98,81 +116,71 @@ app.on('activate', function () {
 //   console.log('Error in auto-updater. ' + err);
 // })
 
-// progress bar
-function progress(progressBar){
-  progressBar
-      .on('completed', function() {
-        console.info(`completed...`);
-        progressBar.detail = 'Task completed. Exiting...';
-      })
-      .on('aborted', function(value) {
-        console.info(`aborted... ${value}`);
-      })
-      .on('progress', function(value) {
-        progressBar.detail = `Value ${value} out of ${progressBar.getOptions().maxValue}...`;
-      });
-      if(!progressBar.isCompleted()){
-        progressBar.value = progr;
-      }
-  }
-
 
 
 // auto updates
 
 
 autoUpdater.on('error', (error) => {
-  console.log(error)
+  console.log(error);
+  mainWindow.webContents.send('updateError', error.toString());
   // dialog.showErrorBox('Error: ', error == null ? "unknown" : (error.stack || error).toString())
-})
+});
 
-autoUpdater.on('update-available', () => {
-  dialog.showMessageBox({
-    type: 'info',
-    title: 'Found Updates',
-    message: 'Found updates, do you want update now?',
-    buttons: ['Sure', 'No']
-  }, (buttonIndex) => {
-    if (buttonIndex === 0) {
-        autoUpdater.downloadUpdate();
-        progressBar = new ProgressBar({
-        indeterminate: false,
-        text: 'Preparing data...',
-        detail: 'Wait...'
-      });
-    }
-  })
+autoUpdater.on('update-available', (info) => {
+  // console.log('update available called');
+  // console.log(info);
+  mainWindow.webContents.send('updateAvailable',info.version);
+  // dialog.showMessageBox({
+  //   type: 'info',
+  //   title: 'Found Updates',
+  //   message: 'Found updates, do you want update now?',
+  //   buttons: ['Sure', 'No']
+  // }, (buttonIndex) => {
+  //   if (buttonIndex === 0) {
+  //       autoUpdater.downloadUpdate();
+  //       progressBar = new ProgressBar({
+  //       indeterminate: false,
+  //       text: 'Preparing data...',
+  //       detail: 'Wait...'
+  //     });
+  //   }
+  // })
 })
 
 autoUpdater.on('update-not-available', () => {
-  if(isUpdatCallFromMenu){
-    dialog.showMessageBox({
-      title: 'No Updates',
-      message: 'Current version is up-to-date.'
-    })
-  }
+  // if(isUpdatCallFromMenu){
+  //   dialog.showMessageBox({
+  //     title: 'No Updates',
+  //     message: 'Current version is up-to-date.'
+  //   })
+  // }
+  mainWindow.webContents.send('updateNotAvailable');
   // updater.enabled = true
   // updater = null
 })
 
 autoUpdater.on('update-downloaded', () => {
-  dialog.showMessageBox({
-    title: 'Install Updates',
-    message: 'Updates downloaded, application will be quit for update...'
-  }, () => {
-    setImmediate(() => autoUpdater.quitAndInstall())
-  })
-})
+  mainWindow.webContents.send('updateDownloaded');
+  // dialog.showMessageBox({
+  //   title: 'Install Updates',
+  //   message: 'Updates downloaded, application will be quit for update...'
+  // }, () => {
+  //   setImmediate(() => autoUpdater.quitAndInstall())
+  // })
+});
 
 autoUpdater.on('download-progress', (progressObj) => {
-    progr = progressObj.percent;
-    progress(progressBar);
+  // console.log('downloading...');
+  if(mainWindow) mainWindow.webContents.send('downloadProgress', progressObj.percent);
+    // progr = progressObj.percent;
+    // progress(progressBar);
   let log_message = "Download speed: " + progressObj.bytesPerSecond;
   log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
   log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
   console.log(log_message);
 })
-autoUpdater.on('update-downloaded', (info) => {
-  console.log('Update downloaded');
-});
+// autoUpdater.on('update-downloaded', (info) => {
+//   console.log('Update downloaded');
+// });
 

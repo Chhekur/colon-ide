@@ -7,6 +7,8 @@ const markdown_converter = new showdown.Converter();
 const path = require('path');
 var files = {};
 var newFileCount = 1;
+var download_progress;
+var userDataPath;
 
 // editor initialisation 
 
@@ -47,14 +49,51 @@ function initEditor(editor_id){
     return editor;
 }
 
+// get userData path
+
+function getUserDataPath(){
+    if(! userDataPath) userDataPath = ipc.sendSync('getUserDataPath');
+    // return ipc.sendSync('getUserDataPath');
+    return userDataPath;
+}
+
+
 // auto mod selector
 // var editor = "";
 CodeMirror.modeURL = "../src/editor/mode/%N/%N.js";
 // var editor = "";
 // var file = "";
-var editor = newTab(undefined , newFileCount , 'untitled', '');
-var file = files['#new' + newFileCount];
-$('#filename_new1').click();
+var editor;
+// checking is last session already there ?
+// console.log(getUserDataPath());
+let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));  
+last_session = JSON.parse(last_session);
+// console.log(last_session,Object.keys(last_session).length);
+if(Object.keys(last_session).length > 0){
+    for (i in last_session){
+        // console.log(i);
+        let data = fs.readFileSync(path.join(getUserDataPath(), last_session[i].current_path), 'utf-8');
+        openFile(data, last_session[i].original_path);
+
+        if('#' + file.id != i){
+            fs.unlinkSync(path.join(getUserDataPath(), last_session[i].current_path));
+            let temp_last_session = fs.readFileSync(path.join(getUserDataPath() , '/last_session/info.json'));
+            temp_last_session = JSON.parse(temp_last_session);
+            delete temp_last_session[i];
+            temp_last_session = JSON.stringify(temp_last_session, null, 2);
+            fs.writeFileSync(path.join(getUserDataPath() , '/last_session/info.json'),temp_last_session);
+        }
+    }
+    // fs.writeFileSync('last_session/info.json','{}');
+}else{
+    newFile();
+    // editor = newTab(undefined , newFileCount , 'untitled', '');
+    // var file = files['#new' + newFileCount];
+    // $('#filename_new1').click();
+}
+
+// checking is last session already there end here
+
 
 ipc.on('openDoubleClickFile', function(event,data,filepath){
     // console.log(data,filepath);
@@ -95,15 +134,24 @@ function newTab(filepath, filecount ,filename, data){
         editor: temp
     }
     temp.on("change", function() {
+        let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
+        last_session = JSON.parse(last_session);
+        fs.writeFile(path.join(getUserDataPath(), last_session['#' + file.id].current_path), editor.getValue(), function(error){
+            if(error) throw error;
+        });
         closeToDot();
-        // clearTimeout(delay);
-        setTimeout(updateHtmlPreview, 300);
-        setTimeout(updateMarkdownPreview,300);
+        // // clearTimeout(delay);
+        // updateHtmlPreview();
+        // updateMarkdownPreview();
+        // setTimeout(updateHtmlPreview, 300);
+        // setTimeout(updateMarkdownPreview,300);
     });
     // console.log(data);
 
     // return editor;
 }
+
+// change css
 
 function changeCSS(cssFile, cssLinkIndex) {
 
@@ -116,6 +164,8 @@ function changeCSS(cssFile, cssLinkIndex) {
 
     document.getElementsByTagName("head").item(0).replaceChild(newlink, oldlink);
 }
+
+// Change Theme
 
 function changeTheme(){
     console.log("Chenge Theme");
@@ -132,19 +182,44 @@ function setTheme(theme_name){
     ipc.send('settingsChangeTheme',theme_name);
 }
 
-ipc.on('openFile',function(event, data, filepath){
+
+// Open File
+
+function openFile(data, filepath){
     newFileCount++;
-    newTab(filepath, newFileCount ,path.basename(filepath),data);
+    newTab(filepath, newFileCount , (filepath == undefined) ? 'untitled': path.basename(filepath),data);
+
+    //last session
+
+    let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
+    last_session = JSON.parse(last_session);
+    // console.log(last_session);
+    last_session['#new' + newFileCount] = {
+        original_path : filepath,
+        current_path : path.join('last_session','#new' + newFileCount)
+    }
+    fs.writeFile(path.join(getUserDataPath(), last_session['#new' + newFileCount].current_path), data, function(error){
+        if(error) throw error;
+    });
+    last_session = JSON.stringify(last_session, null, 2);
+    fs.writeFileSync(path.join(getUserDataPath(), '/last_session/info.json'),last_session);
+
+    // last session end here
+
     $('#filename_new'+newFileCount).click();
     // files['#'+filepath] = {
-    // 	path: filepath,
-    // 	name: path.basename(filepath),
-    // 	id: filepath,
-    // 	editor: editor
+    //  path: filepath,
+    //  name: path.basename(filepath),
+    //  id: filepath,
+    //  editor: editor
     // }
     // // console.log('Hello')
     // editor.getDoc().setValue(data);
+}
 
+
+ipc.on('openFile',function(event, data, filepath){
+    openFile(data,filepath);
 })
 
 
@@ -171,7 +246,27 @@ function closeCurrentFile(file){
     let filecount = parseInt(file.id.split('new')[1]);
     // console.log(nextFile);
     let nextfilecount = findNextFile(filecount);
+
+    // delete file from last session
+
+    let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
+    last_session = JSON.parse(last_session);
+    if(last_session['#new' + filecount]){
+        fs.unlinkSync(path.join(getUserDataPath(), last_session['#new' + filecount].current_path));
+    }
+    // fs.unlinkSync(path.join(__dirname, '..', last_session['#new' + filecount].current_path), function(error){
+    //     if(error) throw error;
+    // });
+    delete last_session['#new' + filecount];
+    last_session = JSON.stringify(last_session, null, 2);
+    fs.writeFileSync(path.join(getUserDataPath(), '/last_session/info.json'), last_session);
+
+    // delete file from last session end here
+
     if(nextfilecount != undefined){
+
+        // console.log(filecount);
+
         $('#file_tab_' + file.id).remove();
         $('#'+ file.id).remove();
         delete files['#'+file.id];
@@ -181,6 +276,7 @@ function closeCurrentFile(file){
         // console.log($('#filename_' + nextFile.split('#')[1]).parent());
         $('#filename_' + nextFile.split('#')[1]).click();
     }else{
+
         ipc.send('close-app');
     }
     // console.log(files.hasOwnProperty(nextFile));
@@ -226,6 +322,26 @@ function openFileFromSidebar(file){
 function newFile(){
     newFileCount ++;
     newTab(undefined , newFileCount , 'untitled', '');
+
+    // new file entry in last session
+
+    let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
+    last_session = JSON.parse(last_session);
+    last_session['#new' + newFileCount] = {
+        original_path : undefined,
+        current_path : path.join('last_session','#new' + newFileCount)
+    }
+    fs.writeFile(path.join(getUserDataPath(), last_session['#new' + newFileCount].current_path), '', function(error){
+        if(error) {
+            console.log(error);
+            throw error;
+        }
+    });
+    last_session = JSON.stringify(last_session, null, 2);
+    fs.writeFileSync(path.join(getUserDataPath(), 'last_session/info.json'), last_session);
+
+    // new file entry in last session end here
+
     $('#filename_new'+newFileCount).click();
 }
 
@@ -238,6 +354,17 @@ ipc.on('saveAs', function(event){
     if(editor != undefined){
         var data = editor.getValue();
         // console.log(data);
+
+        // update file in last session
+
+        let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
+        last_session = JSON.parse(last_session);
+        // console.log(file);
+        fs.writeFile(path.join(getUserDataPath(), last_session['#' + file.id].current_path), data, function(error){
+            if(error) throw error;
+        });
+
+        //update file in last session end here
         ipc.send('saveAs-data', data);
     }
 })
@@ -246,6 +373,18 @@ ipc.on('save', function(event){
     if(editor != undefined){
         var data = editor.getValue();
         // console.log(data);
+
+        // update file in last session
+
+        let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
+        last_session = JSON.parse(last_session);
+        // console.log(file);
+        fs.writeFile(path.join(getUserDataPath(), last_session['#' + file.id].current_path), data, function(error){
+            if(error) throw error;
+        });
+
+        //update file in last session end here
+
         ipc.send('save-data', data, file.path);
     }
 });
@@ -253,6 +392,17 @@ ipc.on('save', function(event){
 ipc.on('data-saved',function(event,filepath){
     file.path = filepath;
     file.name = path.basename(filepath);
+
+    // update original path of file in last session
+
+    let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
+    last_session = JSON.parse(last_session);
+    last_session['#' + file.id].original_path = file.path;
+    last_session = JSON.stringify(last_session, null, 2);
+    fs.writeFileSync(path.join(getUserDataPath(), 'last_session/info.json'), last_session);
+
+    // update original path of file in last session end here
+
     // console.log('Hello');
     dotToClose();
 })
@@ -343,7 +493,8 @@ setInterval(function(){
         // document.getElementById('line').innerHTML = line + 1;
         // document.getElementById('column').innerHTML = column + 1;
         let temp = editor.options.mode.split('/')[1];
-        if(temp.indexOf('-') > -1){
+        // console.log(temp);
+        if(temp != undefined && temp.indexOf('-') > -1){
             temp = temp.split('-')[1];
         }
         $('#footer_' + file['id'] ).find('#mode').html(temp);
@@ -407,7 +558,7 @@ ipc.on('openAbout', function(event){
     // console.log('jello');
     newFileCount++;
     let file_id = "new" + newFileCount;
-    fs.readFile('views/about.html', function(err,data){
+    fs.readFile(path.join(__dirname, 'about.html'), function(err,data){
         if(err) console.log(err);
         $('#code_mirror_editors').append('<li id = "file_tab_'+file_id+'"><a href="" data-target="#' + file_id + '" role="tab" data-toggle="tab"><span id = "filename_'+file_id+'" onclick = "opentab(this)">' + 'About' + '</span><span onclick = "closeAnyFile(this)" class="close black"></span></a></li>');
         $('#editors').append('<div class="tab-pane" id = "'+file_id+'">'+data+'</div>');
@@ -458,12 +609,93 @@ function openHtmlPreview(){
     $('.fa-terminal').removeClass('side-nav-button-active');
     $('.markdown-preview').css('display','none');
     $('.fa-desktop').removeClass('side-nav-button-active');
+    $('.update-download-section').css('display','none');
+    $('.fa-download').removeClass('side-nav-button-active');
 }
 
 ipc.on('openHtmlPreview', function(event){
     openHtmlPreview();
     // $('#preview').html(file.editor.getValue());
 });
+
+
+// open update download section
+
+function openUpdateDownloadSection(){
+    if($('.update-download-section').css('display') == 'none'){
+        $('.panel-middle').css('width','60%');
+        $('.update-download-section').css('display','block');
+        $('.fa-download').addClass('side-nav-button-active');
+    }else{
+        $('.panel-middle').css('width','100%');
+        $('.update-download-section').css('display','none');
+        $('.fa-download').removeClass('side-nav-button-active');
+    }
+    $('.console-container').css('display','none');
+    $('.fa-terminal').removeClass('side-nav-button-active');
+    $('.html-preview').css('display','none');
+    $('.fa-television').removeClass('side-nav-button-active');
+    $('.markdown-preview').css('display','none');
+    $('.fa-desktop').removeClass('side-nav-button-active');
+}
+
+
+ipc.on('openUpdateDownloadSection', function(event){
+    openUpdateDownloadSection();
+});
+
+// open update download section end here
+
+// check for updates
+
+function checkForUpdates(){
+    ipc.send('checkForUpdates');
+    if($('#update-error')) $('#update-error').remove();
+    $('#check-for-update').text('Checking For Updates..');
+}
+
+ipc.on('updateAvailable', function(event, version){
+    $('#update-section-box').empty();
+    $('#update-section-box').append('<p id = "update-version">Update Available ' + version + '</p><br>');
+    $('#update-section-box').append('<button id = "download-button" class="btn" onclick = "downloadUpdate()">Download</button>');
+})
+
+function downloadUpdate(){
+    ipc.send('downloadUpdate');
+    $('#update-section-box').empty();
+    $('#update-section-box').append('<p id = "downloading">Downloading..</p>');
+    $('#update-section-box').append('<div id = "download_bar" style = "width:200px; height:50px;" class = "ldBar" data-preset = "rainbow" data-value = "0"></div>');
+    download_progress = new ldBar("#download_bar");
+}
+
+ipc.on('updateNotAvailable', function(event){
+    $('#check-for-update').remove();
+    $('#update-section-box').append('<p>Current version is up-to-date.</p>');
+
+});
+
+ipc.on('downloadProgress', function(event, percent){
+    download_progress.set(percent);
+    // console.log(percent);
+});
+
+function installUpdate(){
+    ipc.send('installUpdate');
+}
+
+ipc.on('updateDownloaded', function(event){
+    $('#update-section-box').empty();
+    $('#update-section-box').append('<button id = "install-update" class = "btn" onclick="installUpdate()">Install</button>');
+});
+
+ipc.on('updateError', function (event, error){
+    $('#update-section-box').empty();
+    $('#update-section-box').append('<p id = "update-error">' + error + '</p><br>');
+    $('#update-section-box').append('<button class = "btn" id = "check-for-update" onclick="checkForUpdates()">Retry</button>');
+});
+
+// end here
+
 
 // open markdown preview
 
@@ -481,6 +713,8 @@ function openMarkdownPreview(){
     $('.fa-terminal').removeClass('side-nav-button-active');
     $('.html-preview').css('display','none');
     $('.fa-television').removeClass('side-nav-button-active');
+    $('.update-download-section').css('display','none');
+    $('.fa-download').removeClass('side-nav-button-active');
 }
 
 ipc.on('openMarkdownPreview', function(event){
@@ -527,12 +761,34 @@ function closeToDot(){
 
 
 // update preview
-editor.on("change", function() {
+// editor.on("change", function() {
     // clearTimeout(delay);
-    closeToDot();
-    setTimeout(updateHtmlPreview, 300);
-    setTimeout(updateMarkdownPreview, 300);
-});
+
+    // auto save current file on change
+
+    // let last_session = fs.readFileSync('./last_session/info.json');  
+    // last_session = JSON.parse(last_session);
+    // fs.writeFile(last_session['#' + file.id].current_path, editor.getValue(), function(error){
+    //     if(error) throw error;
+    // });
+
+    // end here
+
+    // closeToDot();
+    // setTimeout(updateHtmlPreview, 300);
+    // setTimeout(updateMarkdownPreview, 300);
+    // updateHtmlPreview();
+    // updateMarkdownPreview();
+// });
+
+// Refresh Preview
+
+ipc.on('refreshPreview', function(event){
+    updateHtmlPreview();
+    updateMarkdownPreview();
+})
+
+
 
 function updateHtmlPreview() {
     if(editor != undefined){
@@ -555,8 +811,8 @@ function updateMarkdownPreview(){
     }
 }
 
-setTimeout(updateHtmlPreview, 300);
-setTimeout(updateMarkdownPreview, 300);
+// setTimeout(updateHtmlPreview, 300);
+// setTimeout(updateMarkdownPreview, 300);
 
 // Increase or Decrease font size
 
@@ -597,6 +853,7 @@ function opentab(tab){
     // 	setTimeout(updateMarkdownPreview,300);
     // });
     if(editor != undefined){
+        // editor.refresh();
         setTimeout(function(){
             editor.refresh();
         },1);

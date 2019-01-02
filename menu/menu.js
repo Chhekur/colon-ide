@@ -62,6 +62,13 @@ const template = [
                 role: 'Redo'
             },
             {
+                label: 'Refresh Preview',
+                accelerator : 'CmdOrCtrl+R',
+                click:function(){
+                    fun.refreshPreview();
+                }
+            },
+            {
                 type: 'separator'
             },
             {
@@ -460,12 +467,13 @@ const template = [
     },
     {
         label: 'Help',
-        submenu: [{
-            label: 'Check For Updates...',
-            click:function(){
-                fun.checkForUpdates();
-            }
-        },
+        submenu: [
+        // {
+        //     label: 'Check For Updates...',
+        //     click:function(){
+        //         fun.checkForUpdates();
+        //     }
+        // },
             {
                 label:'About Colon',
                 click:function(){

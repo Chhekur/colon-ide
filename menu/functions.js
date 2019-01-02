@@ -297,6 +297,32 @@ ipc.on('settingsChangeTheme', (event, data)=>{
 });
 
 
+ipc.on('getUserDataPath', function(event){
+    let userDataPath = app.getPath('userData');
+    if(! fs.existsSync(path.join(userDataPath, 'last_session'))){
+        fs.mkdirSync(path.join(userDataPath, 'last_session'));
+        fs.writeFileSync(path.join(userDataPath, 'last_session', 'info.json'), '{}');
+    }else{
+        if(! fs.existsSync(path.join(userDataPath, 'last_session', 'info.json'))){
+            fs.writeFileSync(path.join(userDataPath, 'last_session', 'info.json'), '{}');
+        }
+    }
+    event.returnValue = userDataPath;
+});
+
+
+ipc.on('checkForUpdates',function(event){
+    autoUpdater.checkForUpdates();
+});
+
+ipc.on('downloadUpdate', function(event){
+    autoUpdater.downloadUpdate();
+});
+
+ipc.on('installUpdate', function (event){
+    autoUpdater.quitAndInstall();
+});
+
 function toggleCommentIndented(){
     mainWindow.webContents.send('toggleCommentIndented');
 }
@@ -426,7 +452,7 @@ function openProjectStructure(){
     mainWindow.webContents.send('openProjectStructure');
 }
 function checkForUpdates(){
-    isUpdatCallFromMenu = true;
+    // isUpdatCallFromMenu = true;
     autoUpdater.checkForUpdates();
 }
 function increaseFontSize(){
@@ -446,8 +472,14 @@ function openAbout(){
     mainWindow.webContents.send('openAbout');
 }
 
+function refreshPreview(){
+    mainWindow.webContents.send('refreshPreview');
+}
+
+
 
 module.exports = {
+    refreshPreview : refreshPreview,
     openDoubleClickFile:openDoubleClickFile,
     openFile : openFile,
     openFolder : openFolder,

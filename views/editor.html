@@ -12,6 +12,7 @@
 	<link rel="stylesheet" href="../assets/css/font-awesome.min.css">
 	<link rel="stylesheet" href="../assets/css/bootstrap.css">
 	<link rel="stylesheet" href="../assets/css/metro.css">
+	<link rel="stylesheet" href="../assets/css/loading-bar.css">
 	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
 	<script src = "../src/editor/lib/codemirror.js"></script>
 	<!-- <script src = "../src/editor/mode/javascript/javascript.js"></script> -->
@@ -54,6 +55,7 @@
         window.jQuery = window.$ = require('../assets/js/jquery.js');
 	</script>
 	<script src="../assets/js/bootstrap.min.js"></script>
+	<script src="../assets/js/loading-bar.js"></script>
 	<!-- <script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script> -->
 	<!-- <script src="../menu/functions.js"></script> -->
 </head>
@@ -75,6 +77,9 @@
 			</a></li>
 			<li><a href="#" onclick = "openMarkdownPreview()">
 				<span class="icon"><i class="fa fa-desktop" aria-hidden="true"></i></span>
+			</a></li>
+			<li><a href="#" onclick = "openUpdateDownloadSection()">
+				<span class="icon"><i class="fa fa-download" aria-hidden="true"></i></span>
 			</a></li>
 		</ul>
 	</div>
@@ -107,7 +112,9 @@
 	<div class="panel-right column">
 		<div class = "console-container">
 			<div>
-				<a href="#" style="text-decoration:none" onclick="openConsole()" >&times;</a>
+				<!-- close button -->
+				<!-- <a href="#" style="text-decoration:none" onclick="openConsole()" >&times;</a> -->
+				<!-- end here -->
 				<span class = "vertical-align-middle">Input</span>
 				<img onclick = "run()" src = "../assets/icons/run-button.svg" width="40px;" class = "vertical-align-middle run-button"></img>
 			</div>
@@ -119,11 +126,26 @@
 
 		<div class = "html-preview">
 			<iframe id=html-preview class="html-preview"></iframe>
+			<img style = "position: relative;float: left;bottom:70;right:30;float:right;" onclick = "updateHtmlPreview()" src = "../assets/icons/refresh-button.svg" width="40px"></img>
 		</div>
 		<div class = "markdown-preview">
+			<!-- <button onclick = "updateMarkdownPreview()">refresh</button> -->
 			<iframe id=markdown-preview class="markdown-preview"></iframe>
+			<img style = "position: relative;float: left;bottom:70;right:30;float:right;" onclick = "updateMarkdownPreview()" src = "../assets/icons/refresh-button.svg" width="40px"></img>
 		</div>
+
+		<div class = "update-download-section">
+			<center>
+				<div class = "centered-box" id = "update-section-box">
+					<button class = "btn" id = "check-for-update" onclick="checkForUpdates()">Check For Updates</button>
+					<!-- <div id = "download_bar" class = "ldBar" data-preset = "rainbow" data-value = "50"></div> -->
+				</div>
+			</center>
+		</div>
+
 	</div>
+
+	<!-- Theme Panel -->
 
 	<div id="themeChengePanel" class="center" style="display: none">
 		<div style="width: 100%; height: auto;">
@@ -134,6 +156,8 @@
 			<div style="cursor: pointer;" onclick="setTheme('editor1.css')">Light</div>
 		</div>
 	</div>
+
+	<!-- end here -->
 
 </div>
 </body>
