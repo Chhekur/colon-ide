@@ -1,4 +1,4 @@
-<img src="https://github.com/Chhekur/colon-ide/blob/master/assets/icon.png" width="15%">
+<img src="https://raw.githubusercontent.com/Chhekur/colon-ide/master/assets/icon.png" width="15%">
 
 Colon is a flexible text editor, built on [Electron](https://github.com/electron/electron), and based on everything we love about our favorite editors. We are trying to designe it to be fully customizable.
 
