@@ -33,7 +33,7 @@
     },
     "linux": {
       "target": [
-        "AppImage"  
+        "AppImage"
       ],
       "icon": "assets/icon.icns"
     },

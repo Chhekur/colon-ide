@@ -37,3 +37,14 @@
 
 .cm-s-3024-night .CodeMirror-activeline-background { background: #2F2F2F; }
 .cm-s-3024-night .CodeMirror-matchingbracket { text-decoration: underline; color: white !important; }
+
+.side-nav{
+	background:#090300;
+	color:#a66545;
+}
+.footer{
+	background-color: #060200;
+}
+.splitter{
+	background:#060200;
+}

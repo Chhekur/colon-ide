@@ -9,13 +9,18 @@ var files = {};
 var newFileCount = 1;
 var download_progress;
 var userDataPath;
+let settings_file = fs.readFileSync(path.join(getUserDataPath(), 'settings.json'));
+settings_file = JSON.parse(settings_file);
+
+if(settings_file.theme) changeCSS('../src/editor/theme/' + settings_file.theme, 1);
+console.log((settings_file.theme) ? settings_file.theme : 'one-dark');
 
 // editor initialisation 
 
 function initEditor(editor_id){
     let editor = CodeMirror.fromTextArea(editor_id, {
         lineNumbers: true,
-        theme: "one-dark",
+        theme: (settings_file.theme)? settings_file.theme.split('.')[0] : 'one-dark',
         styleActiveLine: true,
         keyMap: "sublime",
         lineWrapping: true,
@@ -168,7 +173,7 @@ function changeCSS(cssFile, cssLinkIndex) {
 // Change Theme
 
 function changeTheme(){
-    console.log("Chenge Theme");
+    // console.log("Chenge Theme");
     let state = document.getElementById('themeChengePanel').style.display;
     if(state == 'none'){
         document.getElementById('themeChengePanel').style.display = 'block';
@@ -177,10 +182,21 @@ function changeTheme(){
     }
 }
 function setTheme(theme_name){
-    console.log(theme_name);
-    changeCSS('../assets/css/'+theme_name, 7);
-    ipc.send('settingsChangeTheme',theme_name);
+    // console.log(theme_name);
+    changeCSS('../src/editor/theme/' + theme_name, 1);
+    ipc.send('settingsChangeTheme',theme_name);   
 }
+
+ipc.on('themeChanged', function(event){
+    settings_file = fs.readFileSync(path.join(getUserDataPath(), 'settings.json'));
+    settings_file = JSON.parse(settings_file);
+    // console.log(files);
+    for (i in files){
+        files[i].editor.setOption("theme", settings_file.theme.split('.')[0]);
+        // files[i].editor.refresh();
+        // console.log(files[i].editor);
+    }
+});
 
 
 // Open File
@@ -318,6 +334,13 @@ function openFileFromSidebar(file){
     ipc.send('openFileFromSidebar', filepath);
 }
 
+// // copy template to new opened file
+
+// function copyTemplate(){
+
+// }
+
+
 // new File
 function newFile(){
     newFileCount ++;
@@ -389,9 +412,12 @@ ipc.on('save', function(event){
     }
 });
 
-ipc.on('data-saved',function(event,filepath){
+ipc.on('data-saved',function(event,filepath, data){
     file.path = filepath;
     file.name = path.basename(filepath);
+    // console.log(file);
+    file.editor.setValue(data);
+    file.editor.refresh();
 
     // update original path of file in last session
 

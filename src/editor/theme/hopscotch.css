@@ -32,3 +32,55 @@
 
 .cm-s-hopscotch .CodeMirror-matchingbracket { text-decoration: underline; color: white !important;}
 .cm-s-hopscotch .CodeMirror-activeline-background { background: #302020; }
+
+.side-nav{
+  background:#322931;
+  color: #c19fbd;
+}
+.splitter{
+  background: #261f25;
+}
+.splitter2{
+  background: #261f25;
+}
+.footer{
+  background-color: #261f25;
+  color:#9da5b4;
+}
+.nav-tabs{
+  background-color: #261f25;
+}
+.nav-tabs > li.active > a{
+  background-color: #322931;
+  color:#d0d2d4;
+  border-left: 2px solid #ff3939;
+}
+.project-title{
+  background-color: #322931;
+  color:#9da5b4;
+}
+.panel-left{
+  background: #261f25;
+}
+.panel-right{
+  color:#9da5b4;
+  background:#261f25;
+}
+.side-nav-button-active{
+  color:#ff3939;
+}
+.close:hover::before, .close:hover::after {
+  background: #ff3939;
+}
+.dot{
+  background-color: #ff3939;
+}
+.close::before, .close::after {
+  background: #929292;
+}
+.file-list li a{
+  color: #9da5b4;
+}
+.console{
+  color:#fff;
+}

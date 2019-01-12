@@ -76,8 +76,8 @@ input, button, textarea, :focus {
 	font-family: system-ui;
 	line-height: 1.5em;
 	/*padding:5px;*/
-	background-color: #21252b;
-	color:#9da5b4;
+	/*background-color: #21252b;*/
+	/*color:#9da5b4;*/
 }
 .label{
 	font-family: system-ui;
@@ -93,7 +93,7 @@ input, button, textarea, :focus {
 .project-title{
 	font-family: system-ui;
 	font-size: 15px;
-	background-color: #282c34;
+	/*background-color: #282c34;*/
 	padding:7px;
 }
 
@@ -117,13 +117,13 @@ input, button, textarea, :focus {
 	/*min-height: 200px;*/
 	/*min-width: 50px;*/
 	white-space: nowrap;
-	background: #282c34;
-	color: #9da5b4;
+	/*background: #282c34;*/
+	/*color: #9da5b4;*/
 }
 
-.side-nav-button-active{
+/*.side-nav-button-active{
 	color:#bd1010;
-}
+}*/
 
 #project-structure{
 	overflow: auto;
@@ -139,14 +139,14 @@ input, button, textarea, :focus {
 	width: 150px;
 	min-height: 200px;
 	white-space: nowrap;
-	background: #21252b;
+	/*background: #21252b;*/
 	color: #9da5b4;
 }
 
 .splitter {
 	flex: 0 0 auto;
 	width: 5px;  
-	background: url(https://raw.githubusercontent.com/RickStrahl/jquery-resizable/master/assets/vsizegrip.png) center center no-repeat #21252b;
+	/*background: url(https://raw.githubusercontent.com/RickStrahl/jquery-resizable/master/assets/vsizegrip.png) center center no-repeat #21252b;*/
 	min-height: 200px;
 	cursor: col-resize;  
 }
@@ -165,7 +165,7 @@ input, button, textarea, :focus {
 .splitter2 {
 	flex: 0 0 auto;
 	width: 5px;
-	background: url(https://raw.githubusercontent.com/RickStrahl/jquery-resizable/master/assets/vsizegrip.png) center center no-repeat #21252b;
+	/*background: url(https://raw.githubusercontent.com/RickStrahl/jquery-resizable/master/assets/vsizegrip.png) center center no-repeat #21252b;*/
 	min-height: 200px;
 	cursor: col-resize;  
 }
@@ -180,8 +180,8 @@ input, button, textarea, :focus {
 	min-height: 200px;
 	min-width: 200px;
 	white-space: nowrap;
-	background: #21252b;
-	color: #9da5b4;
+	/*background: #21252b;*/
+	/*color: #9da5b4;*/
 }
 
 .console-container{
@@ -196,7 +196,7 @@ input, button, textarea, :focus {
 	background: transparent;
 	width:100%;
 	border:none;
-	color:#fff;
+	/*color:#fff;*/
 	height: 50%;
 	resize: none;
 }
@@ -251,9 +251,9 @@ input, button, textarea, :focus {
   height: 50px;*/
   overflow: hidden;
 }
-.close:hover::before, .close:hover::after {
+/*.close:hover::before, .close:hover::after {
   background: #bd1010;
-}
+}*/
 .close::before, .close::after {
   content: '';
   position: absolute;
@@ -262,7 +262,7 @@ input, button, textarea, :focus {
   top: 75%;
   left: 8;
   margin-top: -1px;
-  background: #929292;
+  /*background: #929292;*/
 }
 .close::before {
   -webkit-transform: rotate(45deg);
@@ -289,7 +289,7 @@ input, button, textarea, :focus {
 	width: 5.5px;
 	top:45%;
 	right:4;
-	background-color: #ff4444;
+	/*background-color: #ff4444;*/
 	border-radius: 50%;
 	/*display: inline-block;*/
 }

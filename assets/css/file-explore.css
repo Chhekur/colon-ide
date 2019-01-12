@@ -14,7 +14,7 @@
 }
 .file-list li a{
     text-decoration: none;
-    color:#9da5b4;  
+    /*color:#9da5b4;  */
 }
 .file-list li a : hover{
     background-color: blue;

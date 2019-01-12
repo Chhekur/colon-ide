@@ -38,3 +38,55 @@
 
 .cm-s-dracula .CodeMirror-activeline-background { background: rgba(255,255,255,0.1); }
 .cm-s-dracula .CodeMirror-matchingbracket { text-decoration: underline; color: white !important; }
+
+.side-nav{
+  background:#282a36;
+  color: #9da5b4;
+}
+.splitter{
+  background: #21232d;
+}
+.splitter2{
+  background: #21232d;
+}
+.footer{
+  background-color: #21232d;
+  color:#9da5b4;
+}
+.nav-tabs{
+  background-color: #21232d;
+}
+.nav-tabs > li.active > a{
+  background-color: #282a36;
+  color:#d0d2d4;
+  border-left: 2px solid #ff3939;
+}
+.project-title{
+  background-color: #282a36;
+  color:#9da5b4;
+}
+.panel-left{
+  background: #21232d;
+}
+.panel-right{
+  color:#9da5b4;
+  background:#21232d;
+}
+.side-nav-button-active{
+  color:#ff3939;
+}
+.close:hover::before, .close:hover::after {
+  background: #ff3939;
+}
+.dot{
+  background-color: #ff3939;
+}
+.close::before, .close::after {
+  background: #929292;
+}
+.file-list li a{
+  color: #9da5b4;
+}
+.console{
+  color:#fff;
+}

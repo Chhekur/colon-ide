@@ -1,4 +1,4 @@
-/*!
+!
  * Bootstrap v3.1.1 (http://getbootstrap.com)
  * Copyright 2011-2014 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
@@ -54,10 +54,10 @@
 .nav > li > a > img {
   max-width: none;
 }
-.nav-tabs {
+/*.nav-tabs {*/
   /*border-bottom: 1px solid #ddd;*/
-  background-color: #21252b;
-}
+  /*background-color: #21252b;*/
+/*}*/
 .nav-tabs > li {
   float: left;
   margin-bottom: -1px;
@@ -77,12 +77,12 @@
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
-  color: #d0d2d4;
+  /*color: #d0d2d4;*/
   cursor: default;
-  background-color: #282c34;
+  /*background-color: #282c34;*/
   /*border: 1px solid #ddd;*/
   /*border-bottom-color: transparent;*/
-  border-left: 2px solid #bd1010;
+  /*border-left: 2px solid #bd1010;*/
   text-decoration: none;
 }
 .nav-tabs.nav-justified {
@@ -725,4 +725,4 @@
 .modal-footer:after {
   clear: both;
 }
-/*# sourceMappingURL=bootstrap.css.map */
+/*# sourceMappingURL=bootstrap.css.map 

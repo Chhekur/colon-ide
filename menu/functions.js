@@ -147,22 +147,41 @@ function save(){
     mainWindow.webContents.send('save');
 }
 
+function copyTemplate(filepath){
+	// console.log(path.join(getUserDataPath(), 'templates', path.basename(filepath).split('.')[1] + '.template'));
+	if(fs.existsSync(path.join(getUserDataPath(), 'templates', path.basename(filepath).split('.')[1] + '.template'))){
+		// console.log('template found..');
+		return fs.readFileSync(path.join(getUserDataPath(), 'templates', path.basename(filepath).split('.')[1] + '.template'), 'utf-8');
+	}else{
+		// console.log('template not found...');
+		return '';
+	}
+}
+
 ipc.on('save-data', function(event,data,filepath){
     // console.log(filepath);
     if(filepath != undefined){
+    	if(data == ''){
+    		// console.log('data null');
+    		data = copyTemplate(filepath);
+    	}
+    	// console.log('file writing...');
         fs.writeFile(filepath, data, function(error){
             if(error) alert("An error ocurred creating the file "+ err.message);
-            mainWindow.webContents.send('data-saved',filepath);
+            mainWindow.webContents.send('data-saved',filepath, data);
         });
     }else{
         dialog.showSaveDialog(function(fileName){
             if(fileName === undefined)return;
+            if(data == ''){
+	    		data = copyTemplate(fileName);
+	    	}
             // filename = fileName
             // console.log(fileName);
             mainWindow.webContents.send('change-mod',fileName);
             fs.writeFile(fileName, data, function(error){
                 if(error) alert("An error ocurred creating the file "+ err.message);
-                mainWindow.webContents.send('data-saved',fileName);
+                mainWindow.webContents.send('data-saved',fileName, data);
             });
         });
     }
@@ -177,11 +196,14 @@ ipc.on('saveAs-data', function(event, data){
     dialog.showSaveDialog(function(fileName){
         if(fileName === undefined)return;
         filename = fileName
+        if(data == ''){
+    		data = copyTemplate(fileName);
+    	}
         // console.log(fileName);
         mainWindow.webContents.send('change-mod',fileName);
         fs.writeFile(fileName, data, function(error){
             if(error) alert("An error ocurred creating the file "+ err.message);
-            mainWindow.webContents.send('data-saved',fileName);
+            mainWindow.webContents.send('data-saved',fileName, data);
         });
     });
 });
@@ -286,19 +308,42 @@ ipc.on('runProgram',function(event,input,filepath){
         }
     }
 });
-var settings_file = require('../settings.json');
+var settings_file = fs.readFileSync(path.join(getUserDataPath(), 'settings.json'));
 ipc.on('settingsChangeTheme', (event, data)=>{
+	settings_file = JSON.parse(settings_file);
     settings_file.theme = data;
-    console.log(settings_file);
-    fs.writeFile('../settings.json', settings_file, (error)=>{
-        if(error)throw error;
-        console.log("theme changed !", data);
-    });
+    // console.log(settings_file);
+    settings_file = JSON.stringify(settings_file, null, 2)
+    fs.writeFileSync(path.join(getUserDataPath(), 'settings.json'), settings_file);
+    // fs.writeFile('../settings.json', settings_file, (error)=>{
+    //     if(error)throw error;
+    //     console.log("theme changed !", data);
+    // });
+    mainWindow.webContents.send('themeChanged');
 });
 
 
 ipc.on('getUserDataPath', function(event){
-    let userDataPath = app.getPath('userData');
+    // let userDataPath = app.getPath('userData');
+    // if(! fs.existsSync(path.join(userDataPath, 'last_session'))){
+    //     fs.mkdirSync(path.join(userDataPath, 'last_session'));
+    //     fs.writeFileSync(path.join(userDataPath, 'last_session', 'info.json'), '{}');
+    // }else{
+    //     if(! fs.existsSync(path.join(userDataPath, 'last_session', 'info.json'))){
+    //         fs.writeFileSync(path.join(userDataPath, 'last_session', 'info.json'), '{}');
+    //     }
+    // }
+    // if(! fs.existsSync(path.join(userDataPath, 'templates'))){
+    // 	fs.mkdirSync(path.join(userDataPath,'templates'));
+    // }
+    event.returnValue = getUserDataPath();
+});
+
+function getUserDataPath(){
+	let userDataPath = app.getPath('userData');
+	if(! fs.existsSync(path.join(userDataPath, 'settings.json'))){
+		fs.writeFileSync(path.join(userDataPath, 'settings.json'), '{}');
+	}
     if(! fs.existsSync(path.join(userDataPath, 'last_session'))){
         fs.mkdirSync(path.join(userDataPath, 'last_session'));
         fs.writeFileSync(path.join(userDataPath, 'last_session', 'info.json'), '{}');
@@ -307,9 +352,20 @@ ipc.on('getUserDataPath', function(event){
             fs.writeFileSync(path.join(userDataPath, 'last_session', 'info.json'), '{}');
         }
     }
-    event.returnValue = userDataPath;
-});
+    if(! fs.existsSync(path.join(userDataPath, 'templates'))){
+    	fs.mkdirSync(path.join(userDataPath,'templates'));
+    }
+    return userDataPath;
+}
 
+function createTemplate(file_ext){
+	mainWindow.webContents.send('openFile', '', path.join(getUserDataPath(),'templates' , file_ext + '.template'));
+	// openFileFromSidebar(path.join(getUserDataPath(), file_ext + '.template'));
+}
+
+function openTemplate(file_ext){
+	openFileFromSidebar(path.join(getUserDataPath(),'templates', file_ext + '.template'));
+}
 
 ipc.on('checkForUpdates',function(event){
     autoUpdater.checkForUpdates();
@@ -533,5 +589,8 @@ module.exports = {
     checkForUpdates : checkForUpdates,
     increaseFontSize : increaseFontSize,
     decreaseFontSize : decreaseFontSize,
-    openAbout : openAbout
+    openAbout : openAbout,
+    createTemplate : createTemplate,
+    getUserDataPath : getUserDataPath,
+    openTemplate : openTemplate
 }
