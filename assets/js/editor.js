@@ -13,32 +13,37 @@ let settings_file = fs.readFileSync(path.join(getUserDataPath(), 'settings.json'
 settings_file = JSON.parse(settings_file);
 
 if(settings_file.theme) changeCSS('../src/editor/theme/' + settings_file.theme, 1);
-console.log((settings_file.theme) ? settings_file.theme : 'one-dark');
+// console.log((settings_file.theme) ? settings_file.theme : 'one-dark');
 
 // editor initialisation 
 
 function initEditor(editor_id){
-    let editor = CodeMirror.fromTextArea(editor_id, {
-        lineNumbers: true,
+
+    let configuration = {
+        // lineNumbers: true,
         theme: (settings_file.theme)? settings_file.theme.split('.')[0] : 'one-dark',
-        styleActiveLine: true,
+        // styleActiveLine: true,
         keyMap: "sublime",
-        lineWrapping: true,
-        foldGutter: true,
-        autoCloseBrackets: true,
-        autoCloseTags: true,
-        showTrailingSpace: true,
-        matchBrackets: true,
+        // lineWrapping: true,
+        // foldGutter: true,
+        // autoCloseBrackets: true,
+        // autoCloseTags: true,
+        // showTrailingSpace: true,
+        // matchBrackets: true,
         mode:'text/text',
         gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
         extraKeys: {"Ctrl-Space": "autocomplete","Ctrl-Q": function(cm){ cm.foldCode(cm.getCursor()); }},
         highlightSelectionMatches: {annotateScrollbar: true},
         // hintOptions: {hint: synonyms},
-        scrollbarStyle: "simple",
-        tabSize: 4,
-        indentUnit: 4,
-        indentWithTabs: true
-    });
+        scrollbarStyle: "simple"
+        // indentWithTabs: true
+    };
+    for(let i in settings_file.editor){
+        configuration[i] = settings_file.editor[i];
+        // editor.setOption(i, settings_file.editor[i]);
+    }
+    let editor = CodeMirror.fromTextArea(editor_id, configuration);
+
     editor.focus();
     editor.on("keyup", function (cm, event) {
         // console.log(event);
@@ -190,12 +195,19 @@ function setTheme(theme_name){
 ipc.on('themeChanged', function(event){
     settings_file = fs.readFileSync(path.join(getUserDataPath(), 'settings.json'));
     settings_file = JSON.parse(settings_file);
+
+    $('#themes').children().removeClass('theme-container-active');
+    $('#' + settings_file.theme.split('.')[0] + '-theme').addClass('theme-container-active');
+
     // console.log(files);
     for (i in files){
         files[i].editor.setOption("theme", settings_file.theme.split('.')[0]);
         // files[i].editor.refresh();
         // console.log(files[i].editor);
     }
+    // file.editor.setOption('theme', settings_file.theme.split('.')[0]);
+    // file.editor.refresh();
+    // editor.refresh();
 });
 
 
@@ -416,8 +428,10 @@ ipc.on('data-saved',function(event,filepath, data){
     file.path = filepath;
     file.name = path.basename(filepath);
     // console.log(file);
-    file.editor.setValue(data);
-    file.editor.refresh();
+    if(file.editor.getValue() == ''){
+        file.editor.setValue(data);
+        file.editor.refresh();
+    }
 
     // update original path of file in last session
 
@@ -577,6 +591,46 @@ ipc.on('error', function(event, message){
     dialog.showErrorBox('Error',message);
 });
 
+// save settings
+
+function saveEditorSettings(){
+    let editor_settings_temp = $('#editor').children();
+    let editor_settings = {};
+    for(let i = 0; i < editor_settings_temp.length; i ++){
+        if(editor_settings_temp[i].getAttribute('for')){
+            // console.log(editor_settings_temp[i].getAttribute('for'))
+            // console.log(editor_settings_temp[i]);
+            // editor_settings[$('#' + editor_settings_temp[i].getAttribute('for')).attr('id')] = $('#' + editor_settings_temp[i].getAttribute('for')).is(':checked');
+            if($('#' + editor_settings_temp[i].getAttribute('for')).attr('type') == 'checkbox'){
+                editor_settings[editor_settings_temp[i].getAttribute('for')] = $('#' + editor_settings_temp[i].getAttribute('for')).is(':checked');
+            }else if($('#' + editor_settings_temp[i].getAttribute('for')).attr('type') == 'number'){
+                // console.log('Hello');
+                // console.log(parseInt($('#' + editor_settings_temp[i].getAttribute('for')).val()));
+                editor_settings[editor_settings_temp[i].getAttribute('for')] = parseInt($('#' + editor_settings_temp[i].getAttribute('for')).val());
+            }
+            // console.log($('#' + editor_settings_temp[i].getAttribute('for')).is(':checked'));
+        }
+    }
+    // console.log(editor_settings);
+
+    ipc.send('saveEditorSettings', editor_settings);
+}
+
+ipc.on('editorSettingsSaved', function(event){
+    let settings_file = fs.readFileSync(path.join(getUserDataPath(), 'settings.json'));
+    settings_file = JSON.parse(settings_file);
+    for(let i in files){
+        for(let j in settings_file.editor){
+            files[i].editor.setOption(j,settings_file.editor[j]);
+            files[i].editor.refresh();
+        }
+    }
+});
+
+// end here
+
+
+
 
 // open about page
 
@@ -600,6 +654,10 @@ ipc.on('openAbout', function(event){
 
 // open console
 function openConsole(){
+    if($('.settings-panel').css('display') != 'none'){
+        openSettingsPanel();
+        editor.refresh();
+    }
     if($('.console-container').css('display') == 'none'){
         $('.panel-middle').css('width','60%');
         $('.console-container').css('display','block');
@@ -613,6 +671,10 @@ function openConsole(){
     $('.fa-television').removeClass('side-nav-button-active');
     $('.markdown-preview').css('display','none');
     $('.fa-desktop').removeClass('side-nav-button-active');
+    $('.update-download-section').css('display','none');
+    $('.fa-download').removeClass('side-nav-button-active');
+    $('.settings-panel').css('display', 'none');
+    $('.fa-cog').removeClass('side-nav-button-active');
 }
 
 ipc.on('openConsole',function(event){
@@ -622,6 +684,10 @@ ipc.on('openConsole',function(event){
 
 // open html preview
 function openHtmlPreview(){
+    if($('.settings-panel').css('display') != 'none'){
+        openSettingsPanel();
+        editor.refresh();
+    }
     if($('.html-preview').css('display') == 'none'){
         $('.panel-middle').css('width','60%');
         $('.html-preview').css('display','block');
@@ -637,6 +703,8 @@ function openHtmlPreview(){
     $('.fa-desktop').removeClass('side-nav-button-active');
     $('.update-download-section').css('display','none');
     $('.fa-download').removeClass('side-nav-button-active');
+    $('.settings-panel').css('display', 'none');
+    $('.fa-cog').removeClass('side-nav-button-active');
 }
 
 ipc.on('openHtmlPreview', function(event){
@@ -644,10 +712,56 @@ ipc.on('openHtmlPreview', function(event){
     // $('#preview').html(file.editor.getValue());
 });
 
+// open settings panel
+
+function openSettingsPanel(){
+    if($('.panel-left').css('display') != 'none'){
+        openProjectStructure();
+        // editor.refresh();
+    }
+    if($('.settings-panel').css('display') == 'none'){
+        $('.panel-middle').css('display','none');
+        $('.settings-panel').css('display','block');
+        $('.fa-cog').addClass('side-nav-button-active');
+        $('#menu-themes').trigger('click');
+        settings_file = fs.readFileSync(path.join(getUserDataPath(), 'settings.json'));
+        settings_file = JSON.parse(settings_file);
+        $('#themes').children().removeClass('theme-container-active');
+        $('#' + settings_file.theme.split('.')[0] + '-theme').addClass('theme-container-active');
+        for(let i in settings_file.editor){
+            if(settings_file.editor[i] == true){
+                $('#' + i).attr('checked','true');
+            }else if(settings_file.editor[i] != true && settings_file.editor[i] != false){
+                $('#' + i).val(settings_file.editor[i]);
+            }
+        }
+    }else{
+        // editor.refresh();
+        $('.panel-middle').css('width','100%');
+        $('.panel-middle').css('display','block');
+        $('.settings-panel').css('display', 'none');
+        $('.fa-cog').removeClass('side-nav-button-active');
+    }
+    $('.console-container').css('display','none');
+    $('.fa-terminal').removeClass('side-nav-button-active');
+    $('.html-preview').css('display','none');
+    $('.fa-television').removeClass('side-nav-button-active');
+    $('.markdown-preview').css('display','none');
+    $('.fa-desktop').removeClass('side-nav-button-active');
+    $('.update-download-section').css('display','none');
+    $('.fa-download').removeClass('side-nav-button-active');
+    editor.refresh();
+}
+
+// open settings panel end here
 
 // open update download section
 
 function openUpdateDownloadSection(){
+    if($('.settings-panel').css('display') != 'none'){
+        openSettingsPanel();
+        editor.refresh();
+    }
     if($('.update-download-section').css('display') == 'none'){
         $('.panel-middle').css('width','60%');
         $('.update-download-section').css('display','block');
@@ -663,6 +777,8 @@ function openUpdateDownloadSection(){
     $('.fa-television').removeClass('side-nav-button-active');
     $('.markdown-preview').css('display','none');
     $('.fa-desktop').removeClass('side-nav-button-active');
+    $('.settings-panel').css('display', 'none');
+    $('.fa-cog').removeClass('side-nav-button-active');
 }
 
 
@@ -726,6 +842,10 @@ ipc.on('updateError', function (event, error){
 // open markdown preview
 
 function openMarkdownPreview(){
+    if($('.settings-panel').css('display') != 'none'){
+        openSettingsPanel();
+        editor.refresh();
+    }
     if($('.markdown-preview').css('display') == 'none'){
         $('.panel-middle').css('width','60%');
         $('.markdown-preview').css('display','block');
@@ -741,6 +861,8 @@ function openMarkdownPreview(){
     $('.fa-television').removeClass('side-nav-button-active');
     $('.update-download-section').css('display','none');
     $('.fa-download').removeClass('side-nav-button-active');
+    $('.settings-panel').css('display', 'none');
+    $('.fa-cog').removeClass('side-nav-button-active');
 }
 
 ipc.on('openMarkdownPreview', function(event){
@@ -756,6 +878,10 @@ ipc.on('changeTheme', function (event) {
 // open project structure
 
 function openProjectStructure(call_from_menu = false){
+    if($('.settings-panel').css('display') != "none"){
+        openSettingsPanel();
+        editor.refresh();
+    }
     if($('.panel-left').css('display') == "none"){
         $('.panel-left').css('display','block');
         $('.panel-left').css('width','150px');
@@ -885,6 +1011,18 @@ function opentab(tab){
         },1);
     }
 }
+
+// open settings right panel
+
+function openSettingsRightPanel(menu){
+    $('.right-settings-panel').children().css('display','none');
+    $('#menu').children().removeClass('menu-active');
+    $('#' + menu).css('display', 'block');
+    $('#menu-' + menu).addClass('menu-active');
+}
+
+// end here
+
 
 
 // Tabs

@@ -308,8 +308,8 @@ ipc.on('runProgram',function(event,input,filepath){
         }
     }
 });
-var settings_file = fs.readFileSync(path.join(getUserDataPath(), 'settings.json'));
 ipc.on('settingsChangeTheme', (event, data)=>{
+	let settings_file = fs.readFileSync(path.join(getUserDataPath(), 'settings.json'));
 	settings_file = JSON.parse(settings_file);
     settings_file.theme = data;
     // console.log(settings_file);
@@ -341,8 +341,25 @@ ipc.on('getUserDataPath', function(event){
 
 function getUserDataPath(){
 	let userDataPath = app.getPath('userData');
+	let settings_default = {
+		  "theme": "one-dark.css",
+		  "editor": {
+		    "autoCloseBrackets": true,
+		    "autoCloseTags": true,
+		    "foldGutter": true,
+		    "indentWithTabs": true,
+		    "lineNumbers": true,
+		    "lineWrapping": true,
+		    "matchBrackets": true,
+		    "showTrailingSpace": true,
+		    "styleActiveLine": true,
+		    "tabSize": 4,
+        	"indentUnit": 4
+		  }
+		}
+	settings_default = JSON.stringify(settings_default, null, 2);
 	if(! fs.existsSync(path.join(userDataPath, 'settings.json'))){
-		fs.writeFileSync(path.join(userDataPath, 'settings.json'), '{}');
+		fs.writeFileSync(path.join(userDataPath, 'settings.json'), settings_default);
 	}
     if(! fs.existsSync(path.join(userDataPath, 'last_session'))){
         fs.mkdirSync(path.join(userDataPath, 'last_session'));
@@ -357,6 +374,17 @@ function getUserDataPath(){
     }
     return userDataPath;
 }
+
+
+ipc.on('saveEditorSettings', function(event, editor_settings){
+	let settings_file = fs.readFileSync(path.join(getUserDataPath(), 'settings.json'));
+	settings_file = JSON.parse(settings_file);
+	settings_file.editor = editor_settings;
+	settings_file = JSON.stringify(settings_file, null, 2)
+    fs.writeFileSync(path.join(getUserDataPath(), 'settings.json'), settings_file);
+    mainWindow.webContents.send('editorSettingsSaved');
+})
+
 
 function createTemplate(file_ext){
 	mainWindow.webContents.send('openFile', '', path.join(getUserDataPath(),'templates' , file_ext + '.template'));

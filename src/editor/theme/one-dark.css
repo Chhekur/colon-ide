@@ -138,3 +138,20 @@
 .console{
   color:#fff;
 }
+#menu > li:hover{
+  background-color: #2f3640;
+}
+.left-settings-panel{
+  border-right: 1px solid #ff3939;
+}
+
+.menu-active{
+  background-color: #2f3640;
+}
+.theme-container:hover{
+  cursor: pointer;
+  background-color: #2f3640;
+}
+.theme-container-active{
+  background-color: #2f3640;
+}

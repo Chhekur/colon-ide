@@ -90,3 +90,20 @@
 .console{
   color:#fff;
 }
+#menu > li:hover{
+  background-color: #2d2f3d;
+}
+.left-settings-panel{
+  border-right: 1px solid #ff3939;
+}
+
+.menu-active{
+  background-color: #2d2f3d;
+}
+.theme-container:hover{
+  cursor: pointer;
+  background-color: #2d2f3d;
+}
+.theme-container-active{
+  background-color: #2d2f3d;
+}

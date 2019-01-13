@@ -72,3 +72,20 @@
 .console{
 	color:black;
 }
+#menu > li:hover{
+  background-color: #c1c1c1;
+}
+.left-settings-panel{
+  border-right: 1px solid #ff3939;
+}
+
+.menu-active{
+  background-color: #c1c1c1;
+}
+.theme-container:hover{
+  cursor: pointer;
+  background-color: #c1c1c1;
+}
+.theme-container-active{
+  background-color: #c1c1c1;
+}
