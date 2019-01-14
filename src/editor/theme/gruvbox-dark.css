@@ -32,3 +32,76 @@
 .cm-s-gruvbox-dark .CodeMirror-matchingbracket { background: #928374; color:#282828 !important; }
 
 .cm-s-gruvbox-dark span.cm-builtin { color: #fe8019; }
+
+.side-nav{
+  background:#303030;
+  color: #9da5b4;
+}
+.splitter{
+  background: #202020;
+}
+.splitter2{
+  background: #202020;
+}
+.footer{
+  background-color: #202020;
+  color:#9da5b4;
+}
+.nav-tabs{
+  background-color: #202020;
+}
+.nav-tabs > li.active > a{
+  background-color: #303030;
+  color:#d0d2d4;
+  border-left: 2px solid #ff3939;
+}
+.project-title{
+  background-color: #303030;
+  color:#9da5b4;
+}
+.panel-left{
+  background: #202020;
+}
+.panel-right{
+  color:#9da5b4;
+  background:#202020;
+}
+.side-nav-button-active{
+  color:#ff3939;
+}
+.close:hover::before, .close:hover::after {
+  background: #ff3939;
+}
+.dot{
+  background-color: #ff3939;
+}
+.close::before, .close::after {
+  background: #929292;
+}
+.file-list li a{
+  color: #9da5b4;
+}
+.console{
+  color:#fff;
+}
+#menu > li:hover{
+  background-color: #303030;
+}
+.left-settings-panel{
+  border-right: 1px solid #ff3939;
+}
+
+.menu-active{
+  background-color: #303030;
+}
+.theme-container:hover{
+  cursor: pointer;
+  background-color: #303030;
+}
+.theme-container-active{
+  background-color: #303030;
+}
+.about-page {
+  color:#abb2bf;
+  background-color:#303030;
+}

@@ -1,8 +1,6 @@
 ## Changelog
-- Fixed double click to open file
-- Side bar added
-- Help menu added
-- Check for updates added
-- Fixed focus on newly opened file
-- Fixed editable font size instead whole layout
-- Markdown preview added
+- Themes Implemented
+- Template Implemented
+- Settings Panel Implemented
+- Hint on Sidebar
+- Multiple instances of same file has been fixed

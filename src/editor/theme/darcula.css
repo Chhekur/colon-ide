@@ -44,3 +44,75 @@
   background-color: #494d4e !important;
   color: #9c9e9e !important;
 }
+.side-nav{
+  background:rgb(72, 72, 72);
+  color: #dbdbdc;
+}
+.splitter{
+  background: #222222;
+}
+.splitter2{
+  background: #222222;
+}
+.footer{
+  background-color: #222222;
+  color:#9da5b4;
+}
+.nav-tabs{
+  background-color: #222222;
+}
+.nav-tabs > li.active > a{
+  background-color: #323131;
+  color:#d0d2d4;
+  border-left: 2px solid #ff3939;
+}
+.project-title{
+  background-color: rgb(72, 72, 72);
+  color:#9da5b4;
+}
+.panel-left{
+  background: #222222;
+}
+.panel-right{
+  background:#222222;
+  color:#9da5b4;
+}
+.side-nav-button-active{
+  color:#ff3939;
+}
+.close:hover::before, .close:hover::after {
+  background: #ff3939;
+}
+.dot{
+  background-color: #ff3939;
+}
+.close::before, .close::after {
+  background: #929292;
+}
+.file-list li a{
+  color: #9da5b4;
+}
+.console{
+  color:#fff;
+}
+#menu > li:hover{
+  background-color: #303030;
+}
+.left-settings-panel{
+  border-right: 1px solid #ff3939;
+}
+
+.menu-active{
+  background-color: #303030;
+}
+.theme-container:hover{
+  cursor: pointer;
+  background-color: #303030;
+}
+.theme-container-active{
+  background-color: #303030;
+}
+.about-page {
+  color:#abb2bf;
+  background-color:#323131;
+}

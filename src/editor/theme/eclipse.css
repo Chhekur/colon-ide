@@ -21,3 +21,75 @@
 
 .cm-s-eclipse .CodeMirror-activeline-background { background: #e8f2ff; }
 .cm-s-eclipse .CodeMirror-matchingbracket { outline:1px solid grey; color:black !important; }
+.side-nav{
+  background:#f7f7f7;
+  color: #3b3b3b;
+}
+.splitter{
+  background: #e1e1e1;
+}
+.splitter2{
+  background: #e1e1e1;
+}
+.footer{
+  background-color: #e1e1e1;
+  color:black;
+}
+.nav-tabs{
+  background-color: #e1e1e1;
+}
+.nav-tabs > li.active > a{
+  background-color: #f7f7f7;
+  color: black;
+  border-left: 2px solid #ff3939;
+}
+.project-title{
+  background-color: #f7f7f7;
+  color:black;
+}
+.panel-left{
+  background: #e1e1e1;
+}
+.panel-right{
+  background:#e1e1e1;
+  color:black;
+}
+.side-nav-button-active{
+  color:#ff3939;
+}
+.close:hover::before, .close:hover::after {
+  background: #ff3939;
+}
+.dot{
+  background-color: #ff3939;
+}
+.close::before, .close::after {
+  background: #929292;
+}
+.file-list li a{
+	color: black;
+}
+.console{
+	color:black;
+}
+#menu > li:hover{
+  background-color: #c1c1c1;
+}
+.left-settings-panel{
+  border-right: 1px solid #ff3939;
+}
+
+.menu-active{
+  background-color: #c1c1c1;
+}
+.theme-container:hover{
+  cursor: pointer;
+  background-color: #c1c1c1;
+}
+.theme-container-active{
+  background-color: #c1c1c1;
+}
+.about-page {
+  color:#000000;
+  background-color:#fff;
+}

@@ -86,3 +86,76 @@
 .cm-s-one-dark .cm-m-css.cm-builtin {color: #56b6c2;}
 /* lua syntax corrections */
 .cm-s-one-dark .cm-m-lua.cm-variable {color: #56b6c2;}
+
+.side-nav{
+  background: #282c34;
+  color: #9da5b4;
+}
+.splitter{
+  background: #21252b;;
+}
+.splitter2{
+  background: #21252b;;
+}
+.footer{
+  background-color: #21252b;
+  color:#9da5b4;
+}
+.nav-tabs{
+  background-color: #21252b;
+}
+.nav-tabs > li.active > a{
+  background-color: #282c34;
+  color:#d0d2d4;
+  border-left: 2px solid #ff3939;
+}
+.project-title{
+  background-color: #282c34;
+  color:#9da5b4;
+}
+.panel-left{
+  background: #21252b;
+}
+.panel-right{
+  color:#9da5b4;
+  background:#21252b;
+}
+.side-nav-button-active{
+  color:#ff3939;
+}
+.close:hover::before, .close:hover::after {
+  background: #ff3939;
+}
+.dot{
+  background-color: #ff3939;
+}
+.close::before, .close::after {
+  background: #929292;
+}
+.file-list li a{
+  color: #9da5b4;
+}
+.console{
+  color:#fff;
+}
+#menu > li:hover{
+  background-color: #2f3640;
+}
+.left-settings-panel{
+  border-right: 1px solid #ff3939;
+}
+
+.menu-active{
+  background-color: #2f3640;
+}
+.theme-container:hover{
+  cursor: pointer;
+  background-color: #2f3640;
+}
+.theme-container-active{
+  background-color: #2f3640;
+}
+.about-page {
+  color:#abb2bf;
+  background-color:#282c34;;
+}
