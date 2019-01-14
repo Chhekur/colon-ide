@@ -1,6 +1,6 @@
 ## Changelog
-- Capable of remembering last session if you forgot to save
-- Auto Save
-- Button & shorcut added to refresh preview
-- Update download progress bar added
-- Improved performance
+- Themes Implemented
+- Template Implemented
+- Settings Panel Implemented
+- Hint on Sidebar
+- Multiple instances of same file has been fixed

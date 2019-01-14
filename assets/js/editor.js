@@ -80,20 +80,26 @@ let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/i
 last_session = JSON.parse(last_session);
 // console.log(last_session,Object.keys(last_session).length);
 if(Object.keys(last_session).length > 0){
-    for (i in last_session){
-        // console.log(i);
+        fs.writeFileSync(path.join(getUserDataPath() , '/last_session/info.json'), '{}');
+    for (let i in last_session){
+        // console.log('i - ', i);
         let data = fs.readFileSync(path.join(getUserDataPath(), last_session[i].current_path), 'utf-8');
         openFile(data, last_session[i].original_path);
-
+        // console.log('file_id - ', '#' + file.id);
+        // console.log('#' + file.id, i);
         if('#' + file.id != i){
             fs.unlinkSync(path.join(getUserDataPath(), last_session[i].current_path));
-            let temp_last_session = fs.readFileSync(path.join(getUserDataPath() , '/last_session/info.json'));
-            temp_last_session = JSON.parse(temp_last_session);
-            delete temp_last_session[i];
-            temp_last_session = JSON.stringify(temp_last_session, null, 2);
-            fs.writeFileSync(path.join(getUserDataPath() , '/last_session/info.json'),temp_last_session);
+            // let temp_last_session = fs.readFileSync(path.join(getUserDataPath() , '/last_session/info.json'));
+            // temp_last_session = JSON.parse(temp_last_session);
+            // delete temp_last_session[i];
+            // temp_last_session = JSON.stringify(temp_last_session, null, 2);
         }
     }
+
+    // for(i in last_session){
+    //     let data = fs.readFileSync(path.join(getUserDataPath(), last_session[i].current_path), 'utf-8');
+    //     openFile(data, last_session[i].original_path);
+    // }
     // fs.writeFileSync('last_session/info.json','{}');
 }else{
     newFile();
@@ -210,39 +216,66 @@ ipc.on('themeChanged', function(event){
     // editor.refresh();
 });
 
+// check is file already opened
+
+function isFileAlreadyOpened(filepath){
+    for(i in files){
+        if(files[i].path == filepath) return true;
+    }
+    return false;
+}
+
+// end here
+
+// get File ID from filepath
+
+function getFileID(filepath){
+    for(i in files){
+        if(files[i].path == filepath) return files[i].id;
+    }
+    return undefined;
+}
+
+// end here
+
 
 // Open File
 
 function openFile(data, filepath){
-    newFileCount++;
-    newTab(filepath, newFileCount , (filepath == undefined) ? 'untitled': path.basename(filepath),data);
+    if(isFileAlreadyOpened(filepath)){
+        // console.log($('#filename_'+getFileID(filepath)));
+        $('#filename_'+getFileID(filepath)).click();
+    }else{
+        newFileCount++;
+        newTab(filepath, newFileCount , (filepath == undefined) ? 'untitled': path.basename(filepath),data);
 
-    //last session
+        //last session
 
-    let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
-    last_session = JSON.parse(last_session);
-    // console.log(last_session);
-    last_session['#new' + newFileCount] = {
-        original_path : filepath,
-        current_path : path.join('last_session','#new' + newFileCount)
-    }
-    fs.writeFile(path.join(getUserDataPath(), last_session['#new' + newFileCount].current_path), data, function(error){
-        if(error) throw error;
-    });
-    last_session = JSON.stringify(last_session, null, 2);
-    fs.writeFileSync(path.join(getUserDataPath(), '/last_session/info.json'),last_session);
+        let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
+        last_session = JSON.parse(last_session);
+        // console.log(last_session);
+        last_session['#new' + newFileCount] = {
+            original_path : filepath,
+            current_path : path.join('last_session','#new' + newFileCount)
+        }
+        fs.writeFile(path.join(getUserDataPath(), last_session['#new' + newFileCount].current_path), data, function(error){
+            if(error) throw error;
+        });
+        last_session = JSON.stringify(last_session, null, 2);
+        fs.writeFileSync(path.join(getUserDataPath(), '/last_session/info.json'),last_session);
 
-    // last session end here
+        // last session end here
 
-    $('#filename_new'+newFileCount).click();
-    // files['#'+filepath] = {
-    //  path: filepath,
-    //  name: path.basename(filepath),
-    //  id: filepath,
-    //  editor: editor
-    // }
-    // // console.log('Hello')
-    // editor.getDoc().setValue(data);
+        $('#filename_new'+newFileCount).click();
+        // files['#'+filepath] = {
+        //  path: filepath,
+        //  name: path.basename(filepath),
+        //  id: filepath,
+        //  editor: editor
+        // }
+        // // console.log('Hello')
+        // editor.getDoc().setValue(data);
+        }
 }
 
 
@@ -635,21 +668,25 @@ ipc.on('editorSettingsSaved', function(event){
 // open about page
 
 ipc.on('openAbout', function(event){
+    if(isFileAlreadyOpened(path.join(__dirname, 'about.html'))){
+        $('#filename_'+getFileID(path.join(__dirname, 'about.html'))).click();
     // console.log('jello');
-    newFileCount++;
-    let file_id = "new" + newFileCount;
-    fs.readFile(path.join(__dirname, 'about.html'), function(err,data){
-        if(err) console.log(err);
-        $('#code_mirror_editors').append('<li id = "file_tab_'+file_id+'"><a href="" data-target="#' + file_id + '" role="tab" data-toggle="tab"><span id = "filename_'+file_id+'" onclick = "opentab(this)">' + 'About' + '</span><span onclick = "closeAnyFile(this)" class="close black"></span></a></li>');
-        $('#editors').append('<div class="tab-pane" id = "'+file_id+'">'+data+'</div>');
-        files['#'+ file_id] = {
-            path: undefined,
-            name: undefined,
-            id: file_id,
-            editor: undefined
-        }
-        $('#filename_new'+newFileCount).click();
-    });
+    }else{
+        newFileCount++;
+        let file_id = "new" + newFileCount;
+        fs.readFile(path.join(__dirname, 'about.html'), function(err,data){
+            if(err) console.log(err);
+            $('#code_mirror_editors').append('<li id = "file_tab_'+file_id+'"><a href="" data-target="#' + file_id + '" role="tab" data-toggle="tab"><span id = "filename_'+file_id+'" onclick = "opentab(this)">' + 'About' + '</span><span onclick = "closeAnyFile(this)" class="close black"></span></a></li>');
+            $('#editors').append('<div class="tab-pane" id = "'+file_id+'">'+data+'</div>');
+            files['#'+ file_id] = {
+                path: path.join(__dirname, 'about.html'),
+                name: undefined,
+                id: file_id,
+                editor: undefined
+            }
+            $('#filename_new'+newFileCount).click();
+        });
+    }
 });
 
 // open console

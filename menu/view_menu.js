@@ -27,11 +27,11 @@ module.exports = [
         click:function(){
             fun.openProjectStructure();
         }
-    },
-    {
-        label : 'Change Theme',
-        click:function(){
-            fun.changeTheme();
-        }
     }
+    // {
+    //     label : 'Change Theme',
+    //     click:function(){
+    //         fun.changeTheme();
+    //     }
+    // }
 ]

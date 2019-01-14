@@ -1,21 +1,29 @@
 <style>
 	.about-page {
 		margin:0px;
-		color:#abb2bf;
+		/*color:#abb2bf;*/
 		font-family:system-ui;
 		align-items: center;
 		display: flex;
 		justify-content: center;
 		height: 100%;
 		width: 100%;
-		background-color:#282c34;
+		/*background-color:#282c34;*/
 	}
 </style>
+
+<script>
+	let fs = require('fs');
+	let path = require('path');
+	let version = fs.readFileSync(path.join(__dirname, '..', 'package.json'));
+	version = JSON.parse(version);
+	document.getElementById('version').innerHTML = version.version;
+</script>
 <div class = "about-page">
 	<center>
 		<img src = "../assets/icon.png" width = 100px>
 		<h1>
-			Colon
+			Colon <span id = "version"></span>
 		</h1>
 		<h4>
 			A flexible text editor or ide
