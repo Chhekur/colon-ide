@@ -284,6 +284,10 @@ ipc.on('openFile',function(event, data, filepath){
 })
 
 
+ipc.on('dirList', (event, files)=>{
+    makeMyDirectoryTree(files);
+});
+
 // close current file
 
 function findNextFile(deleted_file_count){
@@ -357,6 +361,8 @@ ipc.on('openFolder', function(event,structure){
     $(".file-tree").filetree();
     openProjectStructure(true);
 });
+
+ipc.on('openProjectStructure',()=>{openProjectStructure(true)});
 
 // create tree structure for opened folder
 

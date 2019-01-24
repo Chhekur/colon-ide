@@ -4,6 +4,8 @@ const ipc = require('electron').ipcMain;
 const path = require('path');
 const util = require('util');
 const exec = require('child_process').exec;
+const tpl = require('./regX');
+
 // const spawn = require('child_process').spawn;
 
 global.filename = undefined;
@@ -69,6 +71,7 @@ function openFolder(){
     }else{
         // structure[dir[0]] = [];
         structure = dirTree(dir[0]);
+        // dirList(dir[0]); // changing this function to dirList
         // openFolderHelper(dir[0],structure);
         // console.log(typeof structure);
         mainWindow.webContents.send('openFolder',structure);
@@ -76,6 +79,45 @@ function openFolder(){
     // console.log()
 }
 
+//
+// // Sync File structure
+// function dirList(folderName) {
+//     var stats = fs.lstatSync(folderName);
+//     let list = {};
+//
+//     if(stats.isDirectory()) {
+//         list.path = folderName;
+//         list.name = path.join('',path.basename(folderName));
+//         list.type = 'folder';
+//         list.nodes = [];
+//
+//         fs.readdir(folderName, (err, files) => {
+//             if (err) reject(err);
+//             else {
+//                 let count = files.length;
+//                 files.forEach(function (name) {
+//                     var filePath = path.join(folderName, name);
+//                     var stat = fs.statSync(filePath);
+//                     if (stat.isFile()) {
+//                         list.nodes.push({name:name, type:'file'});
+//                     } else if (stat.isDirectory()) {
+//                         list.nodes.push({name:name, type:'folder'});
+//                     }
+//
+//                     count--;
+//                     if(count === 0){
+//                         mainWindow.webContents.send('openProjectStructure');
+//                         mainWindow.webContents.send('dirList', list);
+//                     }
+//                 });
+//             }
+//         });
+//
+//
+//     }else{
+//         console.error(`${folderName} is not a directory`);
+//     }
+// }
 function dirTree(filename) {
     var stats = fs.lstatSync(filename),
         info = {
@@ -94,6 +136,7 @@ function dirTree(filename) {
         info.type = "file";
     }
     // console.log(typeof info);
+
     return info;
 }
 
@@ -164,12 +207,20 @@ ipc.on('save-data', function(event,data,filepath){
     	if(data == ''){
     		// console.log('data null');
     		data = copyTemplate(filepath);
-    	}
-    	// console.log('file writing...');
-        fs.writeFile(filepath, data, function(error){
-            if(error) alert("An error ocurred creating the file "+ err.message);
-            mainWindow.webContents.send('data-saved',filepath, data);
-        });
+    		tpl.compile(data).then((data)=>{
+                fs.writeFile(filepath, data, function(error){
+                    if(error) alert("An error ocurred creating the file "+ err.message);
+                    mainWindow.webContents.send('data-saved',filepath, data);
+                });
+            });
+    	}else{
+    	    // console.log('file writing...');
+            fs.writeFile(filepath, data, function(error){
+                if(error) alert("An error ocurred creating the file "+ err.message);
+                mainWindow.webContents.send('data-saved',filepath, data);
+            });
+        }
+
     }else{
         dialog.showSaveDialog(function(fileName){
             if(fileName === undefined)return;
@@ -178,10 +229,13 @@ ipc.on('save-data', function(event,data,filepath){
 	    	}
             // filename = fileName
             // console.log(fileName);
-            mainWindow.webContents.send('change-mod',fileName);
-            fs.writeFile(fileName, data, function(error){
-                if(error) alert("An error ocurred creating the file "+ err.message);
-                mainWindow.webContents.send('data-saved',fileName, data);
+
+            tpl.compile(data).then((data)=>{
+                mainWindow.webContents.send('change-mod',fileName);
+                fs.writeFile(fileName, data, function(error){
+                    if(error) alert("An error ocurred creating the file "+ err.message);
+                    mainWindow.webContents.send('data-saved',fileName, data);
+                });
             });
         });
     }
