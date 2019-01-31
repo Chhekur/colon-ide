@@ -347,6 +347,21 @@ ipc.on('closeFile',function(event){
     closeCurrentFile(file);
 });
 
+// generate valid ID from path
+
+function pathToId(filepath){
+    filepath = filepath.replace(/ /g, '_');
+    filepath = filepath.replace(/:/g, '');
+    let tokens = filepath.split(path.sep);
+    let ID = '';
+    for(let i = 0; i < tokens.length; i++){
+        ID += tokens[i];
+    }
+    // console.log(ID);
+    return ID;
+}
+
+
 
 // open folder
 ipc.on('openFolder', function(event,structure){
@@ -354,17 +369,41 @@ ipc.on('openFolder', function(event,structure){
     response += makeDirectoryTree(structure.children);
     response += '</ul>';
     $('#project-structure').html(response);
+    // console.log($('#project-structure'));
     $(".file-tree").filetree();
     openProjectStructure(true);
 });
 
+// create directory for specific Dirpath
+
+function createDirectoryForSpecificDirpath(folder){
+    // console.log(folder.getAttribute('data-path'));
+    // console.log($('#' + pathToId(folder.getAttribute('data-path'))).length);
+    // console.log($('#' + pathToId(folder.getAttribute('data-path'))).children());
+    
+    if($('#' + pathToId(folder.getAttribute('data-path'))).children().length == 0){
+        ipc.send('createDirectoryForSpecificDirpath', folder.getAttribute('data-path'));
+    }
+}
+
+ipc.on('getDirectroyForSpecificDirpath', function(event, structure){
+    // console.log(structure);
+    // console.log(structure.path);
+    // console.log(makeDirectoryTree(structure.children));
+    // console.log($('#' + structure.path.replace(/ /g, '_')));
+    // console.log($('#askdfhkjashdfkjasdf'))
+
+    $('#' + pathToId(structure.path)).html(makeDirectoryTree(structure.children));
+    $('#' + pathToId(structure.path)).filetree();
+});
 // create tree structure for opened folder
 
 function makeDirectoryTree(structure){
     var response = "";
     structure.forEach(function(obj){
         if(obj.type == "folder"){
-            response += '<li><a href="#"><span class = "label">'+ obj.name + '</span></a><ul>' + makeDirectoryTree(obj.children) + '</ul></li>';
+            // response += '<li><a href="#"><span class = "label">'+ obj.name + '</span></a><ul>' + makeDirectoryTree(obj.children) + '</ul></li>';
+            response += '<li><a href="#"><span class = "label" onclick = "createDirectoryForSpecificDirpath(this)" data-path = "' + obj.path + '">'+ obj.name + '</span></a><ul id = "' + pathToId(obj.path) + '"></ul></li>';
         }else{
             response += '<li data-extension = "'+obj.name+'"><a href="#"><span onclick = "openFileFromSidebar(this)" class = "label" data-name = "'+ obj.name +'" data-path = "'+ obj.path +'">' + obj.name + '</span></a></li>';
         }
@@ -591,19 +630,19 @@ $(".panel-middle").resizable({
 // create directory tree structure
 
 
-$(document).ready(function() {
-    $(".file-tree").filetree();
-});
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-36251023-1']);
-_gaq.push(['_setDomainName', 'jqueryscript.net']);
-_gaq.push(['_trackPageview']);
+// $(document).ready(function() {
+//     $(".file-tree").filetree();
+// });
+// var _gaq = _gaq || [];
+// _gaq.push(['_setAccount', 'UA-36251023-1']);
+// _gaq.push(['_setDomainName', 'jqueryscript.net']);
+// _gaq.push(['_trackPageview']);
 
-(function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
+// (function() {
+//     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+//     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+//     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+// })();
 
 // run program
 function run(){

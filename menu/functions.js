@@ -71,10 +71,16 @@ function openFolder(){
         structure = dirTree(dir[0]);
         // openFolderHelper(dir[0],structure);
         // console.log(typeof structure);
+        // console.log(structure);
         mainWindow.webContents.send('openFolder',structure);
     }
     // console.log()
 }
+
+ipc.on('createDirectoryForSpecificDirpath', function(event, folderpath){
+	// console.log(dirTree(folderpath));
+	mainWindow.webContents.send('getDirectroyForSpecificDirpath', dirTree(folderpath));
+});
 
 function dirTree(filename) {
     var stats = fs.lstatSync(filename),
@@ -82,18 +88,30 @@ function dirTree(filename) {
             path: filename,
             name: path.basename(filename)
         };
-
-    if (stats.isDirectory()) {
-        info.type = "folder";
-        info.children = fs.readdirSync(filename).map(function(child) {
-            return dirTree(path.join(filename,child));
-        });
-    } else {
-        // Assuming it's a file. In real life it could be a symlink or
-        // something else!
-        info.type = "file";
-    }
+    // console.log(stats);
+    let files = fs.readdirSync(filename);
+    let temp_str = [];
+    files.forEach(function(file){
+    	temp_str.push({
+			path : path.join(filename, file),
+			name : file,
+			type : ((fs.lstatSync(path.join(filename, file)).isDirectory()) ? "folder" : "file")
+		});
+    });
+    info.children = temp_str;
+    // if (stats.isDirectory()) {
+    //     info.type = "folder";
+    //     // return dirTree(filename);
+    //     // info.children = fs.readdirSync(filename).map(function(child) {
+    //     //     return dirTree(path.join(filename,child));
+    //     // });
+    // } else {
+    //     // Assuming it's a file. In real life it could be a symlink or
+    //     // something else!
+    //     info.type = "file";
+    // }
     // console.log(typeof info);
+    // console.log(info);
     return info;
 }
 
