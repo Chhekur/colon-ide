@@ -19,7 +19,10 @@
   "dependencies": {
     "electron-log": "^2.2.17",
     "electron-updater": "^4.0.6",
-    "showdown": "^1.8.6"
+    "localtunnel": "^1.9.1",
+    "showdown": "^1.8.6",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0"
   },
   "build": {
     "appId": "com.chhekur.colon",

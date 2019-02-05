@@ -216,6 +216,18 @@ input, button, textarea, :focus {
 	border: none;
 }
 
+.code-sharing-panel{
+	position: relative;
+	display: none;
+	font-family: monospace;
+	font-size: 13;
+	white-space: pre-line;
+	width:100%;
+	border:none;
+	/*color:#fff;*/
+	height: 100%;
+}
+
 .update-download-section{
 	position: relative;
 	vertical-align: middle;
@@ -228,12 +240,12 @@ input, button, textarea, :focus {
 
 .centered-box{
 	position: absolute;
-    top: 0;
-    bottom: 0;
+    /*top: 0;*/
+    bottom: 50%;
     left: 0;
     right: 0;
-    width: 50%;
-    height: 0;
+    /*width: 50%;*/
+    /*height: 0;*/
     margin: auto;
 }
 

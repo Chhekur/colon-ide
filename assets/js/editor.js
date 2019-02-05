@@ -1,3 +1,11 @@
+var app = require('http').createServer();
+var io = require('socket.io')(app);
+var localtunnel = require('localtunnel');
+const io_client = require('socket.io-client');
+var socket;
+var clients = [];
+// var socket = require('socket.io-client');
+
 const ipc = require('electron').ipcRenderer;
 const {dialog} = require('electron').remote;
 window.$ = window.jQuery = require('../assets/js/jquery.js');
@@ -6,6 +14,7 @@ const fs = require('fs');
 const markdown_converter = new showdown.Converter();
 const path = require('path');
 var files = {};
+var remoteFile;
 var newFileCount = 1;
 var download_progress;
 var userDataPath;
@@ -128,7 +137,7 @@ ipc.on('openDoubleClickFile', function(event,data,filepath){
 // var file = files['#new1'];
 // var editor1 = initEditor('code1')
 
-function newTab(filepath, filecount ,filename, data){
+function newTab(filepath, filecount ,filename, data, remote_path){
     let file_id = "new" + filecount;
     // if(filepath == undefined){
     // 	file_id = "new"+filecount;
@@ -146,6 +155,7 @@ function newTab(filepath, filecount ,filename, data){
     files['#'+ file_id] = {
         path: filepath,
         name: filename,
+        remote_path:remote_path,
         id: file_id,
         editor: temp
     }
@@ -241,13 +251,13 @@ function getFileID(filepath){
 
 // Open File
 
-function openFile(data, filepath){
+function openFile(data, filepath, filename, remote_path){
     if(isFileAlreadyOpened(filepath)){
         // console.log($('#filename_'+getFileID(filepath)));
         $('#filename_'+getFileID(filepath)).click();
     }else{
         newFileCount++;
-        newTab(filepath, newFileCount , (filepath == undefined) ? 'untitled': path.basename(filepath),data);
+        newTab(filepath, newFileCount , (filename != undefined) ? filename : ((filepath == undefined) ? 'untitled': path.basename(filepath)),data, remote_path);
 
         //last session
 
@@ -751,6 +761,8 @@ function openConsole(){
     $('.fa-download').removeClass('side-nav-button-active');
     $('.settings-panel').css('display', 'none');
     $('.fa-cog').removeClass('side-nav-button-active');
+    $('.code-sharing-panel').css('display','none');
+    $('.fa-share-square-o').removeClass('side-nav-button-active');
 }
 
 ipc.on('openConsole',function(event){
@@ -781,6 +793,8 @@ function openHtmlPreview(){
     $('.fa-download').removeClass('side-nav-button-active');
     $('.settings-panel').css('display', 'none');
     $('.fa-cog').removeClass('side-nav-button-active');
+    $('.code-sharing-panel').css('display','none');
+    $('.fa-share-square-o').removeClass('side-nav-button-active');
 }
 
 ipc.on('openHtmlPreview', function(event){
@@ -826,10 +840,144 @@ function openSettingsPanel(){
     $('.fa-desktop').removeClass('side-nav-button-active');
     $('.update-download-section').css('display','none');
     $('.fa-download').removeClass('side-nav-button-active');
+    $('.code-sharing-panel').css('display','none');
+    $('.fa-share-square-o').removeClass('side-nav-button-active');
     editor.refresh();
 }
 
 // open settings panel end here
+
+// open code sharing panel
+
+function openCodeSharingPanel(){
+    if($('.settings-panel').css('display') != 'none'){
+        openSettingsPanel();
+        editor.refresh();
+    }
+    if($('.code-sharing-panel').css('display') == 'none'){
+        $('.panel-middle').css('width','60%');
+        $('.code-sharing-panel').css('display','block');
+        $('.fa-share-square-o').addClass('side-nav-button-active');
+    }else{
+        $('.panel-middle').css('width','100%');
+        $('.code-sharing-panel').css('display','none');
+        $('.fa-share-square-o').removeClass('side-nav-button-active');
+    }
+    $('.console-container').css('display','none');
+    $('.fa-terminal').removeClass('side-nav-button-active');
+    $('.html-preview').css('display','none');
+    $('.fa-television').removeClass('side-nav-button-active');
+    $('.markdown-preview').css('display','none');
+    $('.fa-desktop').removeClass('side-nav-button-active');
+    $('.settings-panel').css('display', 'none');
+    $('.fa-cog').removeClass('side-nav-button-active');
+    $('.update-download-section').css('display','none');
+    $('.fa-download').removeClass('side-nav-button-active');
+}
+
+// end here
+
+// code sharing function
+
+function shareCode(){
+    $('#code-sharing-box').html('<h5>Waiting...</h5>');
+    app.listen(4000, function(){
+        // console.log('listening at 4000');
+        var tunnel = localtunnel(4000, function(err, tunnel) {
+            if (err) {
+                // console.log(err);
+                $('#code-sharing-box').html(err);
+            }
+         
+            // the assigned public url for your tunnel
+            // i.e. https://abcdefgjhij.localtunnel.me
+            $('#code-sharing-box').html('<h5>Share this url with whome you want to share</h5><br>');
+            $('#code-sharing-box').append('<h5>' + tunnel.url + '</h5><br>');
+            $('#code-sharing-box').append('<button class = "btn" id = "commit-changes-sender" onclick="commitChangesSender()">Commit Changes</button>');
+            $('#code-sharing-box').append('<button class = "btn" id = "disconnect" onclick="disconnect()">Disconnect</button><br><br>');
+            // console.log(tunnel.url);
+        });
+        tunnel.on('error', function(err) {
+            $('#code-sharing-box').html(err);
+        });
+    });
+    // console.log(file);
+    io.on('connection', function (socket) {
+        clients.push(socket);
+      socket.emit('file', { id: file.id, name:file.name, remote_path:file.path, data:file.editor.getValue() });
+      socket.on('commit-changes', function (data) {
+        // console.log('hello');
+        if(file.id == data.id && file.path == data.path){
+            file.editor.setValue(data.data);
+            editor.setValue(data.data);
+        }
+        files['#' + data.id].editor.setValue(data.data);
+      });
+    });
+}
+
+function connect(flag){
+    if(!flag){
+        $('#code-sharing-box').html('<input class = "input-field" id = "url"><br> <br><button class ="btn" onclick = "connect(true)">Connect</button>');
+    }else{
+        let url = $('#url').val();
+        $('#code-sharing-box').html('<h5>Waiting...</h5>');
+        socket = io_client(url);
+        socket.on('file', function (data) {
+            remoteFile = data;
+            // newFileCount++;
+            // newTab(undefined, newFileCount, path.basename(data.remote_path), data.data);
+            openFile(data.data, undefined, path.basename(data.remote_path), data.remote_path);
+            // console.log(data);
+            // socket.emit('my other event', { my: 'data' });
+            $('#code-sharing-box').html('<button class = "btn" id = "commit_changes" onclick="commitChanges()">Commit Changes</button><br><br>');
+            $('#code-sharing-box').append('<button class = "btn" id = "close_socket" onclick="closeSocket()">Close Connection</button>');
+        });
+        socket.on('commit-changes', function(data){
+            // console.log('data recieved');
+            // console.log(file.remote_path, remoteFile.remote_path);
+            if(file.remote_path == remoteFile.remote_path){
+                file.editor.setValue(data.data);
+                editor.setValue(data.data);
+                // console.log('if executed');
+            }
+            // console.log('after if');
+            for(let i = 0; i < files.length; i++){
+                if(files[i].remote_path == remoteFile.remote_path){
+                    // console.log('file found');
+                    files[i].editor.setValue(data.data);
+                }
+            }
+        });
+    }
+}
+
+function commitChangesSender(){
+    for(let i = 0; i < clients.length; i++){
+        clients[i].emit('commit-changes', {id:file.id, name:file.name, path:file.path, data:file.editor.getValue()});
+    }
+}
+
+function commitChanges(){
+    socket.emit('commit-changes', {id:remoteFile.id, name:remoteFile.name, path:remoteFile.remote_path, data:file.editor.getValue()});
+}
+
+function backAllButtons(){
+    $('#code-sharing-box').html('<button class = "btn" id = "share-code" onclick="shareCode()">Share Code</button><br><br><button class = "btn" id = "connect" onclick="connect(false)">Connect</button>');
+}
+
+function closeSocket(){
+    socket.destroy();
+    backAllButtons();
+}
+
+function disconnect(){
+    app.close();
+    backAllButtons();
+}
+
+// end here
+
 
 // open update download section
 
@@ -855,6 +1003,8 @@ function openUpdateDownloadSection(){
     $('.fa-desktop').removeClass('side-nav-button-active');
     $('.settings-panel').css('display', 'none');
     $('.fa-cog').removeClass('side-nav-button-active');
+    $('.code-sharing-panel').css('display','none');
+    $('.fa-share-square-o').removeClass('side-nav-button-active');
 }
 
 
@@ -939,6 +1089,8 @@ function openMarkdownPreview(){
     $('.fa-download').removeClass('side-nav-button-active');
     $('.settings-panel').css('display', 'none');
     $('.fa-cog').removeClass('side-nav-button-active');
+    $('.code-sharing-panel').css('display','none');
+    $('.fa-share-square-o').removeClass('side-nav-button-active');
 }
 
 ipc.on('openMarkdownPreview', function(event){
