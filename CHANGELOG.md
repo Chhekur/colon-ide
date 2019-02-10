@@ -1,2 +1,3 @@
 ## Changelog
-- Fixed: when open a huge directory, it will make colon slow
+- Add: Real Time Code Sharing
+- Fixed: XSS Vulnerability

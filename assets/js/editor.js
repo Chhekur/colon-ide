@@ -877,48 +877,59 @@ function openCodeSharingPanel(){
 
 // end here
 
+function isCurrentFileSaved(){
+    // if(file.path != undefined) return true
+    var data = editor.getValue();
+    // console.log(file.path);
+    ipc.send('save-data', data, file.path);
+    if(file.path != undefined) return true;
+    else return false;
+}
+
 // code sharing function
 
 function shareCode(){
-    $('#code-sharing-box').html('<h5>Waiting...</h5>');
-    app.listen(4000, function(){
-        // console.log('listening at 4000');
-        var tunnel = localtunnel(4000, function(err, tunnel) {
-            if (err) {
-                // console.log(err);
+    if(isCurrentFileSaved()){
+        $('#code-sharing-box').html('<h5>Waiting...</h5>');
+        app.listen(4000, function(){
+            // console.log('listening at 4000');
+            var tunnel = localtunnel(4000, function(err, tunnel) {
+                if (err) {
+                    // console.log(err);
+                    $('#code-sharing-box').html(err);
+                }
+             
+                // the assigned public url for your tunnel
+                // i.e. https://abcdefgjhij.localtunnel.me
+                $('#code-sharing-box').html('<h5>Share this url with whome you want to share</h5><br>');
+                $('#code-sharing-box').append('<h5>' + tunnel.url + '</h5><br>');
+                $('#code-sharing-box').append('<button class = "btn" id = "commit-changes-sender" onclick="commitChangesSender()">Commit Changes</button><br><br>');
+                $('#code-sharing-box').append('<button class = "btn" id = "disconnect" onclick="disconnect()">Disconnect</button>');
+                // console.log(tunnel.url);
+            });
+            tunnel.on('error', function(err) {
                 $('#code-sharing-box').html(err);
+            });
+        });
+        // console.log(file);
+        io.on('connection', function (socket) {
+            clients.push(socket);
+          socket.emit('file', { id: file.id, name:file.name, remote_path:file.path, data:file.editor.getValue() });
+          socket.on('commit-changes', function (data) {
+            // console.log('hello');
+            if(file.id == data.id && file.path == data.path){
+                file.editor.setValue(data.data);
+                editor.setValue(data.data);
             }
-         
-            // the assigned public url for your tunnel
-            // i.e. https://abcdefgjhij.localtunnel.me
-            $('#code-sharing-box').html('<h5>Share this url with whome you want to share</h5><br>');
-            $('#code-sharing-box').append('<h5>' + tunnel.url + '</h5><br>');
-            $('#code-sharing-box').append('<button class = "btn" id = "commit-changes-sender" onclick="commitChangesSender()">Commit Changes</button>');
-            $('#code-sharing-box').append('<button class = "btn" id = "disconnect" onclick="disconnect()">Disconnect</button><br><br>');
-            // console.log(tunnel.url);
+            files['#' + data.id].editor.setValue(data.data);
+          });
         });
-        tunnel.on('error', function(err) {
-            $('#code-sharing-box').html(err);
-        });
-    });
-    // console.log(file);
-    io.on('connection', function (socket) {
-        clients.push(socket);
-      socket.emit('file', { id: file.id, name:file.name, remote_path:file.path, data:file.editor.getValue() });
-      socket.on('commit-changes', function (data) {
-        // console.log('hello');
-        if(file.id == data.id && file.path == data.path){
-            file.editor.setValue(data.data);
-            editor.setValue(data.data);
-        }
-        files['#' + data.id].editor.setValue(data.data);
-      });
-    });
+    }
 }
 
 function connect(flag){
     if(!flag){
-        $('#code-sharing-box').html('<input class = "input-field" id = "url"><br> <br><button class ="btn" onclick = "connect(true)">Connect</button>');
+        $('#code-sharing-box').html('<input placeholder = "URL" class = "input-field" id = "url"><br> <br><button class ="btn" onclick = "connect(true)">Connect</button>');
     }else{
         let url = $('#url').val();
         $('#code-sharing-box').html('<h5>Waiting...</h5>');
@@ -927,7 +938,7 @@ function connect(flag){
             remoteFile = data;
             // newFileCount++;
             // newTab(undefined, newFileCount, path.basename(data.remote_path), data.data);
-            openFile(data.data, undefined, path.basename(data.remote_path), data.remote_path);
+            openFile(data.data, undefined, data.name, data.remote_path);
             // console.log(data);
             // socket.emit('my other event', { my: 'data' });
             $('#code-sharing-box').html('<button class = "btn" id = "commit_changes" onclick="commitChanges()">Commit Changes</button><br><br>');
@@ -948,6 +959,9 @@ function connect(flag){
                     files[i].editor.setValue(data.data);
                 }
             }
+        });
+        socket.on('error', function(error){
+            $('#code-sharing-box').html(error);
         });
     }
 }
