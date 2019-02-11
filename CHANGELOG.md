@@ -1,3 +1,2 @@
 ## Changelog
-- Add: Real Time Code Sharing
-- Fixed: XSS Vulnerability
+- Add: Discord RPC

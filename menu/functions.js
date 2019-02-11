@@ -4,6 +4,9 @@ const ipc = require('electron').ipcMain;
 const path = require('path');
 const util = require('util');
 const exec = require('child_process').exec;
+
+// console.log('loading functions-rpc.js');
+
 // const spawn = require('child_process').spawn;
 
 global.filename = undefined;
@@ -163,6 +166,14 @@ function newFile(){
 
 function save(){
     mainWindow.webContents.send('save');
+}
+
+function getCurrentWorkingFile(callback){
+    mainWindow.webContents.send('currentWorkingFile')
+    ipc.once('getCurrentWorkingFile', function(event, filename){
+        // console.log(filename);
+        callback(filename);
+    })
 }
 
 function copyTemplate(filepath){
@@ -373,7 +384,11 @@ function getUserDataPath(){
 		    "styleActiveLine": true,
 		    "tabSize": 4,
         	"indentUnit": 4
-		  }
+		  },
+          "discord":{
+            "discord-rpc-enable":false,
+            "discord-status":"I am new to colon"
+          }
 		}
 	settings_default = JSON.stringify(settings_default, null, 2);
 	if(! fs.existsSync(path.join(userDataPath, 'settings.json'))){
@@ -401,6 +416,15 @@ ipc.on('saveEditorSettings', function(event, editor_settings){
 	settings_file = JSON.stringify(settings_file, null, 2)
     fs.writeFileSync(path.join(getUserDataPath(), 'settings.json'), settings_file);
     mainWindow.webContents.send('editorSettingsSaved');
+})
+
+ipc.on('saveDiscordSettings', function(event, discord_settings){
+    let settings_file = fs.readFileSync(path.join(getUserDataPath(), 'settings.json'));
+    settings_file = JSON.parse(settings_file);
+    settings_file.discord = discord_settings;
+    settings_file = JSON.stringify(settings_file, null, 2)
+    fs.writeFileSync(path.join(getUserDataPath(), 'settings.json'), settings_file);
+    mainWindow.webContents.send('discordSettingsSaved');
 })
 
 
@@ -638,5 +662,6 @@ module.exports = {
     openAbout : openAbout,
     createTemplate : createTemplate,
     getUserDataPath : getUserDataPath,
-    openTemplate : openTemplate
+    openTemplate : openTemplate,
+    getCurrentWorkingFile : getCurrentWorkingFile
 }

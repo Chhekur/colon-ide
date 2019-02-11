@@ -3,6 +3,8 @@ global.autoUpdater = require("electron-updater").autoUpdater;
 const log = require('electron-log');
 const dialog = require('electron').dialog;
 
+
+
 let updater
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
@@ -40,6 +42,7 @@ function createWindow () {
 		mainWindow = null
 	})
   require('./menu/menu.js');
+  require('./assets/js/discord-rpc.js');
 }
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -72,7 +75,7 @@ app.on('ready', function(){
 		 //      	message:process.argv[1].toString()
 		 //      });
 		 //      console.log(process.argv);
-      		require('./menu/functions.js').openDoubleClickFile(process.argv[1]);
+          require('./menu/functions.js').openDoubleClickFile(process.argv[1]);
       	}
   	});
     // autoUpdater.checkForUpdatesAndNotify();

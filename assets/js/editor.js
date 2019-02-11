@@ -137,6 +137,11 @@ ipc.on('openDoubleClickFile', function(event,data,filepath){
 // var file = files['#new1'];
 // var editor1 = initEditor('code1')
 
+ipc.on('currentWorkingFile', function(event){
+    event.sender.send('getCurrentWorkingFile', file.name);
+});
+
+
 function newTab(filepath, filecount ,filename, data, remote_path){
     let file_id = "new" + filecount;
     // if(filepath == undefined){
@@ -675,6 +680,8 @@ ipc.on('error', function(event, message){
 
 // save settings
 
+//save editor settings
+
 function saveEditorSettings(){
     let editor_settings_temp = $('#editor').children();
     let editor_settings = {};
@@ -712,6 +719,29 @@ ipc.on('editorSettingsSaved', function(event){
 // end here
 
 
+// save discord settings
+
+function saveDiscordSettings(){
+    let discord_settings_temp = $('#discord-rpc').children();
+    let discord_settings = {};
+    for(let i = 0; i < discord_settings_temp.length; i ++){
+        if(discord_settings_temp[i].getAttribute('for')){
+            if($('#' + discord_settings_temp[i].getAttribute('for')).attr('type') == 'checkbox'){
+                discord_settings[discord_settings_temp[i].getAttribute('for')] = $('#' + discord_settings_temp[i].getAttribute('for')).is(':checked');
+            }else if($('#' + discord_settings_temp[i].getAttribute('for')).attr('type') == 'text'){
+                discord_settings[discord_settings_temp[i].getAttribute('for')] = $('#' + discord_settings_temp[i].getAttribute('for')).val();
+                // console.log($('#discord-status').val())
+            }
+        }
+    }
+    // console.log(discord_settings);
+
+    ipc.send('saveDiscordSettings', discord_settings);
+}
+
+ipc.on('discordSettingsSaved', function(event){
+    console.log('discord settings saved');
+});
 
 
 // open about page
@@ -823,6 +853,13 @@ function openSettingsPanel(){
                 $('#' + i).attr('checked','true');
             }else if(settings_file.editor[i] != true && settings_file.editor[i] != false){
                 $('#' + i).val(settings_file.editor[i]);
+            }
+        }
+        for(let i in settings_file.discord){
+            if(settings_file.discord[i] == true){
+                $('#' + i).attr('checked','true');
+            }else if(settings_file.discord[i] != true && settings_file.editor[i] != false){
+                $('#' + i).val(settings_file.discord[i]);
             }
         }
     }else{
