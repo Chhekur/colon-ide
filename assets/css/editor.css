@@ -253,8 +253,14 @@ input, button, textarea, :focus {
 	vertical-align: middle;
 }
 
-.run-button:{
+.run-button{
 	cursor: pointer;
+}
+
+.stop-button{
+	cursor: pointer;
+	width: 20px;
+	margin:10px;
 }
 .close {
   position: relative;
@@ -454,4 +460,11 @@ input, button, textarea, :focus {
 }
 ::-webkit-outer-spin-button, ::-webkit-inner-spin-button{
 	-webkit-appearance: none;
+}
+
+.hide{
+	display: none;
+}
+.show{
+	display: block;
 }

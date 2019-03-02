@@ -6,19 +6,19 @@ Colon is a flexible text editor, built on [Electron](https://github.com/electron
 
 ### macOS
 
-Download the latest [Colon release](https://github.com/Chhekur/colon-ide/releases/download/v1.4.1/Colon-1.4.1.dmg) for mac.
+Download the latest [Colon release](https://github.com/Chhekur/colon-ide/releases/download/v1.4.2/Colon-1.4.2.dmg) for mac.
 
 Colon will automatically update when a new release is available.
 
 ### Windows
 
-Download the latest [Colon installer](https://github.com/Chhekur/colon-ide/releases/download/v1.4.1/Colon-Setup-1.4.1.exe) for windows.
+Download the latest [Colon installer](https://github.com/Chhekur/colon-ide/releases/download/v1.4.2/Colon-Setup-1.4.2.exe) for windows.
 
 Colon will automatically update when a new release is available.
 
 ### Linux
 
-Download the latest [Colon installer](https://github.com/Chhekur/colon-ide/releases/download/v1.4.1/Colon-1.4.1-x86_64.AppImage) for linux.
+Download the latest [Colon installer](https://github.com/Chhekur/colon-ide/releases/download/v1.4.2/Colon-1.4.2-x86_64.AppImage) for linux.
 
 ## License
 

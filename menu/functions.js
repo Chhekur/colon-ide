@@ -4,12 +4,14 @@ const ipc = require('electron').ipcMain;
 const path = require('path');
 const util = require('util');
 const exec = require('child_process').exec;
+const psTree = require('ps-tree');
 
 // console.log('loading functions-rpc.js');
 
 // const spawn = require('child_process').spawn;
 
 global.filename = undefined;
+var child;
 
 function openFileFromSidebar(filepath){
     // console.log(filepath);
@@ -245,6 +247,31 @@ ipc.on('close-app',function(event){
     app.quit();
 })
 
+function killProcess (pid, signal, callback) {
+    signal   = signal || 'SIGKILL';
+    callback = callback || function () {};
+    var killTree = true;
+    if(killTree) {
+        psTree(pid, function (err, children) {
+            [pid].concat(
+                children.map(function (p) {
+                    return p.PID;
+                })
+            ).forEach(function (tpid) {
+                try { process.kill(tpid, signal) }
+                catch (ex) { }
+            });
+            callback();
+        });
+    } else {
+        try { process.kill(pid, signal) }
+        catch (ex) { }
+        callback();
+    }
+};
+
+
+
 function makeCommand(filepath){
     // console.log(filepath)
     let filename = path.basename(filepath);
@@ -319,17 +346,21 @@ ipc.on('runProgram',function(event,input,filepath){
                     mainWindow.webContents.send('runProgramStatus',err.message);
                     // console.log(err.message);
                 }else{
-                    let child = exec(command,{maxBuffer: 1024 * 500} , function(err,stdout,stderr){
+                    child = exec(command,{maxBuffer: 1024 * 10000} , function(err,stdout,stderr){
                         if(err){
+                            console.log(err, 'line 324');
+                            killProcess(child.pid);
+                            // child.kill();
+                            // console.log(child);
                             console.log(err);
+                            if(child.killed){
+                                err.message = "Process has been killed"
+                            }
                             mainWindow.webContents.send('runProgramStatus',err.message);
                             // console.log(err.message.split('\n')[1]);
                         }else{
                             mainWindow.webContents.send('runProgramStatus',stdout);
                             // console.log(stdout);
-                            var to = setTimeout(function(){
-                                child.kill();
-                            }, 2000);
                         }
                     });
                 }
@@ -337,6 +368,15 @@ ipc.on('runProgram',function(event,input,filepath){
         }
     }
 });
+
+ipc.on('stopProgram', function(event){
+    if(child){
+        child.killed = true;
+        killProcess(child.pid);
+
+    }
+});
+
 ipc.on('settingsChangeTheme', (event, data)=>{
 	let settings_file = fs.readFileSync(path.join(getUserDataPath(), 'settings.json'));
 	settings_file = JSON.parse(settings_file);

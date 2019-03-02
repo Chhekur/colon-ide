@@ -666,10 +666,18 @@ function run(){
     ipc.send('save-data', data, file.path);
     let input = $('#input').val();
     ipc.send('runProgram',input,file.path);
+    $('.run-button').addClass('hide');
+    $('.stop-button').removeClass('hide');
+}
+
+function stop(){
+    ipc.send('stopProgram');
 }
 
 ipc.on('runProgramStatus',function(event,output){
     $('#output').html(output);
+    $('.run-button').removeClass('hide');
+    $('.stop-button').addClass('hide');
 });
 
 // error dialog
