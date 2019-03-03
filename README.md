@@ -31,7 +31,7 @@ Colon IDE provide you facility to execute over 10+ programming languages code si
 
 ### Libraries 🌟
 
-Scribbler uses a number of API's and libraries to work properly:
+Colon uses a number of API's and libraries to work properly:
 
 * ✅ [NodeJs] - evented I/O for the backend
 * ✅ [codemirror] - full featured text editor
