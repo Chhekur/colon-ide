@@ -395,6 +395,29 @@ p {
     transition-duration: 500ms;
 }
 
+/* fix for download button */
+
+a > .button {
+    color: #fff;
+    font-weight: 500;
+    display: inline-block;
+    border: 2px solid #a883e9;
+    height: 50px;
+    min-width: 178px;
+    line-height: 46px;
+    text-align: center;
+    border-radius: 24px 24px 24px 0px;
+}
+a > .button:hover{
+    background: #fb397d;
+    color: #fff;
+    border-color: transparent;
+    -webkit-transition-duration: 500ms;
+    -o-transition-duration: 500ms;
+    transition-duration: 500ms;
+}
+
+/* end fix for download button */
 
 .button > a{
     color: #fff;
