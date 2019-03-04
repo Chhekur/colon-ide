@@ -73,9 +73,11 @@
                         <h2>Colon</h2>
                         <h3>C</h3>
                         <h4 style="color:#fff;">A flexible and hybrid text editor | IDE</h4><br>
-                        <div class="button">
-                            <a href="#" id = "download_button">Download</a>
-                        </div>
+                        <a href="#" id="download_link">
+                            <div id="download_button" class="button">
+                                Download
+                            </div>
+                        </a>
                     </div>
                     <!-- <div class="get-start-area"> -->
                         <!-- Form Start -->
@@ -737,22 +739,22 @@
 
     if (navigator.appVersion.indexOf("Win")!=-1) {
         OSName="Windows";
-        $('#download_button').html('Download For Windows');
-        $('#download_button').attr('href', download_win);
+        $('#download_link').html('Download For Windows');
+        $('#download_link').attr('href', download_win);
     }
     if (navigator.appVersion.indexOf("Mac")!=-1) {
         OSName="MacOS";
-        $('#download_button').html('Download For Mac');
-        $('#download_button').attr('href', download_mac);
+        $('#download_link').html('Download For Mac');
+        $('#download_link').attr('href', download_mac);
     }
     if (navigator.appVersion.indexOf("X11")!=-1) {
-        $('#download_button').html('Download For Mac');
-        $('#download_button').attr('href', download_mac);
+        $('#download_link').html('Download For Mac');
+        $('#download_link').attr('href', download_mac);
     }
     if (navigator.appVersion.indexOf("Linux")!=-1) {
         OSName="Linux";
-        $('#download_button').html('Download For Linux');
-        $('#download_button').attr('href', download_linux);
+        $('#download_link').html('Download For Linux');
+        $('#download_link').attr('href', download_linux);
     }
 
     console.log('Your OS: '+OSName);
