@@ -65,22 +65,40 @@ function openFile(){
     });
 }
 
-function openFolder(){
+function openFolder(project_path){
 
     let structure = {};
-    let dir = dialog.showOpenDialog(mainWindow,{properties : ['openDirectory']});
-    if(dir === undefined){
-        console.log("No folder selected");
+    if(project_path == undefined){
+        let dir = dialog.showOpenDialog(mainWindow, {properties: ['openDirectory']});
+        structure = {
+            path : dir[0],
+            name : path.basename(dir[0])
+        }
     }else{
-        // structure[dir[0]] = [];
-        structure = dirTree(dir[0]);
-        // openFolderHelper(dir[0],structure);
-        // console.log(typeof structure);
-        // console.log(structure);
-        mainWindow.webContents.send('openFolder',structure);
+        structure = {
+            path : project_path,
+            name : path.basename(project_path)
+        }
     }
+    mainWindow.webContents.send('openFolder', structure);
+    // let dir = dialog.showOpenDialog(mainWindow,{properties : ['openDirectory']});
+    // if(dir === undefined){
+    //     console.log("No folder selected");
+    // }else{
+    //     // structure[dir[0]] = [];
+    //     structure = dirTree(dir[0]);
+    //     // openFolderHelper(dir[0],structure);
+    //     // console.log(typeof structure);
+    //     // console.log(structure);
+    //     mainWindow.webContents.send('openFolder',structure);
+    // }
     // console.log()
 }
+
+ipc.on('openProjectFromLastSession', function(event, project_path){
+    // console.log(project_path);
+    openFolder(project_path);
+})
 
 ipc.on('createDirectoryForSpecificDirpath', function(event, folderpath){
 	// console.log(dirTree(folderpath));
@@ -437,9 +455,13 @@ function getUserDataPath(){
     if(! fs.existsSync(path.join(userDataPath, 'last_session'))){
         fs.mkdirSync(path.join(userDataPath, 'last_session'));
         fs.writeFileSync(path.join(userDataPath, 'last_session', 'info.json'), '{}');
+        fs.writeFileSync(path.join(userDataPath, 'last_session', 'project_info.json'), '{}');
     }else{
         if(! fs.existsSync(path.join(userDataPath, 'last_session', 'info.json'))){
             fs.writeFileSync(path.join(userDataPath, 'last_session', 'info.json'), '{}');
+        }
+        if(! fs.existsSync(path.join(userDataPath, 'last_session', 'project_info.json'))){
+            fs.writeFileSync(path.join(userDataPath, 'last_session', 'project_info.json'), '{}');
         }
     }
     if(! fs.existsSync(path.join(userDataPath, 'templates'))){

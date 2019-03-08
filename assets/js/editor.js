@@ -1,10 +1,5 @@
-var app = require('http').createServer();
-var io = require('socket.io')(app);
-var localtunnel = require('localtunnel');
-const io_client = require('socket.io-client');
-var socket;
-var clients = [];
-// var socket = require('socket.io-client');
+const code_sharing = require('../assets/js/code_sharing.js');
+const last_session = require('../assets/js/last_session.js');
 
 const ipc = require('electron').ipcRenderer;
 const {dialog} = require('electron').remote;
@@ -83,39 +78,10 @@ CodeMirror.modeURL = "../src/editor/mode/%N/%N.js";
 // var editor = "";
 // var file = "";
 var editor;
-// checking is last session already there ?
-// console.log(getUserDataPath());
-let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));  
-last_session = JSON.parse(last_session);
-// console.log(last_session,Object.keys(last_session).length);
-if(Object.keys(last_session).length > 0){
-        fs.writeFileSync(path.join(getUserDataPath() , '/last_session/info.json'), '{}');
-    for (let i in last_session){
-        // console.log('i - ', i);
-        let data = fs.readFileSync(path.join(getUserDataPath(), last_session[i].current_path), 'utf-8');
-        openFile(data, last_session[i].original_path);
-        // console.log('file_id - ', '#' + file.id);
-        // console.log('#' + file.id, i);
-        if('#' + file.id != i){
-            fs.unlinkSync(path.join(getUserDataPath(), last_session[i].current_path));
-            // let temp_last_session = fs.readFileSync(path.join(getUserDataPath() , '/last_session/info.json'));
-            // temp_last_session = JSON.parse(temp_last_session);
-            // delete temp_last_session[i];
-            // temp_last_session = JSON.stringify(temp_last_session, null, 2);
-        }
-    }
 
-    // for(i in last_session){
-    //     let data = fs.readFileSync(path.join(getUserDataPath(), last_session[i].current_path), 'utf-8');
-    //     openFile(data, last_session[i].original_path);
-    // }
-    // fs.writeFileSync('last_session/info.json','{}');
-}else{
-    newFile();
-    // editor = newTab(undefined , newFileCount , 'untitled', '');
-    // var file = files['#new' + newFileCount];
-    // $('#filename_new1').click();
-}
+// checking is last session already there ?
+last_session.checkLastSessionProjectAndOpen()
+last_session.checkLastSessionFilesAndOpen();
 
 // checking is last session already there end here
 
@@ -150,7 +116,7 @@ function newTab(filepath, filecount ,filename, data, remote_path){
     // 	file_id = filepath;
     // }
     $('#code_mirror_editors').append('<li id = "file_tab_'+file_id+'"><a href="" data-target="#' + file_id + '" role="tab" data-toggle="tab"><span id = "filename_'+file_id+'" onclick = "opentab(this)">' + filename + '</span><span onclick = "closeAnyFile(this)" class="close black"></span></a></li>');
-    $('#editors').append('<div class="tab-pane" id = "'+file_id+'"><textarea id="file_'+file_id+'"></textarea></div>');
+    $('#editors').append('<div class="tab-pane" id = "'+file_id+'"><textarea id="file_'+file_id+'" autofocus></textarea></div>');
     let temp = initEditor(document.getElementById('file_' + file_id));
     temp.setValue(data);
     chagneEditorMode(filename,temp);
@@ -165,11 +131,7 @@ function newTab(filepath, filecount ,filename, data, remote_path){
         editor: temp
     }
     temp.on("change", function() {
-        let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
-        last_session = JSON.parse(last_session);
-        fs.writeFile(path.join(getUserDataPath(), last_session['#' + file.id].current_path), editor.getValue(), function(error){
-            if(error) throw error;
-        });
+        last_session.changeLastSessionFilesContent(file.id, editor.getValue());
         closeToDot();
         // // clearTimeout(delay);
         // updateHtmlPreview();
@@ -235,7 +197,7 @@ ipc.on('themeChanged', function(event){
 
 function isFileAlreadyOpened(filepath){
     for(i in files){
-        if(files[i].path == filepath) return true;
+        if(files[i].path == filepath && filepath != undefined) return true;
     }
     return false;
 }
@@ -266,19 +228,8 @@ function openFile(data, filepath, filename, remote_path){
 
         //last session
 
-        let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
-        last_session = JSON.parse(last_session);
-        // console.log(last_session);
-        last_session['#new' + newFileCount] = {
-            original_path : filepath,
-            current_path : path.join('last_session','#new' + newFileCount)
-        }
-        fs.writeFile(path.join(getUserDataPath(), last_session['#new' + newFileCount].current_path), data, function(error){
-            if(error) throw error;
-        });
-        last_session = JSON.stringify(last_session, null, 2);
-        fs.writeFileSync(path.join(getUserDataPath(), '/last_session/info.json'),last_session);
-
+        last_session.makeNewLastSessionFile(newFileCount, filepath, data);
+        
         // last session end here
 
         $('#filename_new'+newFileCount).click();
@@ -325,17 +276,7 @@ function closeCurrentFile(file){
 
     // delete file from last session
 
-    let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
-    last_session = JSON.parse(last_session);
-    if(last_session['#new' + filecount]){
-        fs.unlinkSync(path.join(getUserDataPath(), last_session['#new' + filecount].current_path));
-    }
-    // fs.unlinkSync(path.join(__dirname, '..', last_session['#new' + filecount].current_path), function(error){
-    //     if(error) throw error;
-    // });
-    delete last_session['#new' + filecount];
-    last_session = JSON.stringify(last_session, null, 2);
-    fs.writeFileSync(path.join(getUserDataPath(), '/last_session/info.json'), last_session);
+    last_session.deleteLastSessionFile(file.id);
 
     // delete file from last session end here
 
@@ -352,8 +293,14 @@ function closeCurrentFile(file){
         // console.log($('#filename_' + nextFile.split('#')[1]).parent());
         $('#filename_' + nextFile.split('#')[1]).click();
     }else{
-
-        ipc.send('close-app');
+        // console.log(files['#' + file.id].filepath, files);
+        if(files['#' + file.id].path != undefined){
+            $('#file_tab_' + file.id).remove();
+            $('#'+ file.id).remove();
+            delete files['#'+file.id];
+            newFile();
+        }
+        // ipc.send('close-app');
     }
     // console.log(files.hasOwnProperty(nextFile));
 }
@@ -379,14 +326,21 @@ function pathToId(filepath){
 
 
 // open folder
-ipc.on('openFolder', function(event,structure){
-    let response = '<ul class="file-tree"><li><a href="#"><span class = "label">' + structure.name + '</span></a><ul>';
-    response += makeDirectoryTree(structure.children);
-    response += '</ul>';
+
+function openFolder(structure){
+    
+    let response = '<ul class="file-tree" ><li><a href="#"><span class = "label" onclick = "createDirectoryForSpecificDirpath(this)" data-path = "' + structure.path + '">' + structure.name + '</span></a><ul id = "' + pathToId(structure.path) + '"></ul>';
     $('#project-structure').html(response);
     // console.log($('#project-structure'));
     $(".file-tree").filetree();
     openProjectStructure(true);
+
+    last_session.openLastSessionFolders();
+    last_session.newLastSessionForProject(structure.path);
+}
+
+ipc.on('openFolder', function(event,structure){
+    openFolder(structure);
 });
 
 // create directory for specific Dirpath
@@ -402,6 +356,7 @@ function createDirectoryForSpecificDirpath(folder){
 }
 
 ipc.on('getDirectroyForSpecificDirpath', function(event, structure){
+    console.log('open')
     // console.log(structure);
     // console.log(structure.path);
     // console.log(makeDirectoryTree(structure.children));
@@ -410,6 +365,8 @@ ipc.on('getDirectroyForSpecificDirpath', function(event, structure){
 
     $('#' + pathToId(structure.path)).html(makeDirectoryTree(structure.children));
     $('#' + pathToId(structure.path)).filetree();
+    last_session.updateOpenFolderInProjectInfo(pathToId(structure.path));
+
 });
 // create tree structure for opened folder
 
@@ -447,20 +404,7 @@ function newFile(){
 
     // new file entry in last session
 
-    let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
-    last_session = JSON.parse(last_session);
-    last_session['#new' + newFileCount] = {
-        original_path : undefined,
-        current_path : path.join('last_session','#new' + newFileCount)
-    }
-    fs.writeFile(path.join(getUserDataPath(), last_session['#new' + newFileCount].current_path), '', function(error){
-        if(error) {
-            console.log(error);
-            throw error;
-        }
-    });
-    last_session = JSON.stringify(last_session, null, 2);
-    fs.writeFileSync(path.join(getUserDataPath(), 'last_session/info.json'), last_session);
+    last_session.makeNewLastSessionFile(newFileCount, undefined, '');
 
     // new file entry in last session end here
 
@@ -479,12 +423,7 @@ ipc.on('saveAs', function(event){
 
         // update file in last session
 
-        let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
-        last_session = JSON.parse(last_session);
-        // console.log(file);
-        fs.writeFile(path.join(getUserDataPath(), last_session['#' + file.id].current_path), data, function(error){
-            if(error) throw error;
-        });
+        last_session.changeLastSessionFilesContent(file.id, data);
 
         //update file in last session end here
         ipc.send('saveAs-data', data);
@@ -498,12 +437,7 @@ ipc.on('save', function(event){
 
         // update file in last session
 
-        let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
-        last_session = JSON.parse(last_session);
-        // console.log(file);
-        fs.writeFile(path.join(getUserDataPath(), last_session['#' + file.id].current_path), data, function(error){
-            if(error) throw error;
-        });
+        last_session.changeLastSessionFilesContent(file.id, data);
 
         //update file in last session end here
 
@@ -522,11 +456,7 @@ ipc.on('data-saved',function(event,filepath, data){
 
     // update original path of file in last session
 
-    let last_session = fs.readFileSync(path.join(getUserDataPath(), '/last_session/info.json'));
-    last_session = JSON.parse(last_session);
-    last_session['#' + file.id].original_path = file.path;
-    last_session = JSON.stringify(last_session, null, 2);
-    fs.writeFileSync(path.join(getUserDataPath(), 'last_session/info.json'), last_session);
+    last_session.updateLastSessionFilePath(file.id, file.path);
 
     // update original path of file in last session end here
 
@@ -931,112 +861,6 @@ function isCurrentFileSaved(){
     else return false;
 }
 
-// code sharing function
-
-function shareCode(){
-    if(isCurrentFileSaved()){
-        $('#code-sharing-box').html('<h5>Waiting...</h5>');
-        app.listen(4000, function(){
-            // console.log('listening at 4000');
-            var tunnel = localtunnel(4000, function(err, tunnel) {
-                if (err) {
-                    // console.log(err);
-                    $('#code-sharing-box').html(err);
-                }
-             
-                // the assigned public url for your tunnel
-                // i.e. https://abcdefgjhij.localtunnel.me
-                $('#code-sharing-box').html('<h5>Share this url with whome you want to share</h5><br>');
-                $('#code-sharing-box').append('<h5>' + tunnel.url + '</h5><br>');
-                $('#code-sharing-box').append('<button class = "btn" id = "commit-changes-sender" onclick="commitChangesSender()">Commit Changes</button><br><br>');
-                $('#code-sharing-box').append('<button class = "btn" id = "disconnect" onclick="disconnect()">Disconnect</button>');
-                // console.log(tunnel.url);
-            });
-            tunnel.on('error', function(err) {
-                $('#code-sharing-box').html(err);
-            });
-        });
-        // console.log(file);
-        io.on('connection', function (socket) {
-            clients.push(socket);
-          socket.emit('file', { id: file.id, name:file.name, remote_path:file.path, data:file.editor.getValue() });
-          socket.on('commit-changes', function (data) {
-            // console.log('hello');
-            if(file.id == data.id && file.path == data.path){
-                file.editor.setValue(data.data);
-                editor.setValue(data.data);
-            }
-            files['#' + data.id].editor.setValue(data.data);
-          });
-        });
-    }
-}
-
-function connect(flag){
-    if(!flag){
-        $('#code-sharing-box').html('<input placeholder = "URL" class = "input-field" id = "url"><br> <br><button class ="btn" onclick = "connect(true)">Connect</button>');
-    }else{
-        let url = $('#url').val();
-        $('#code-sharing-box').html('<h5>Waiting...</h5>');
-        socket = io_client(url);
-        socket.on('file', function (data) {
-            remoteFile = data;
-            // newFileCount++;
-            // newTab(undefined, newFileCount, path.basename(data.remote_path), data.data);
-            openFile(data.data, undefined, data.name, data.remote_path);
-            // console.log(data);
-            // socket.emit('my other event', { my: 'data' });
-            $('#code-sharing-box').html('<button class = "btn" id = "commit_changes" onclick="commitChanges()">Commit Changes</button><br><br>');
-            $('#code-sharing-box').append('<button class = "btn" id = "close_socket" onclick="closeSocket()">Close Connection</button>');
-        });
-        socket.on('commit-changes', function(data){
-            // console.log('data recieved');
-            // console.log(file.remote_path, remoteFile.remote_path);
-            if(file.remote_path == remoteFile.remote_path){
-                file.editor.setValue(data.data);
-                editor.setValue(data.data);
-                // console.log('if executed');
-            }
-            // console.log('after if');
-            for(let i = 0; i < files.length; i++){
-                if(files[i].remote_path == remoteFile.remote_path){
-                    // console.log('file found');
-                    files[i].editor.setValue(data.data);
-                }
-            }
-        });
-        socket.on('error', function(error){
-            $('#code-sharing-box').html(error);
-        });
-    }
-}
-
-function commitChangesSender(){
-    for(let i = 0; i < clients.length; i++){
-        clients[i].emit('commit-changes', {id:file.id, name:file.name, path:file.path, data:file.editor.getValue()});
-    }
-}
-
-function commitChanges(){
-    socket.emit('commit-changes', {id:remoteFile.id, name:remoteFile.name, path:remoteFile.remote_path, data:file.editor.getValue()});
-}
-
-function backAllButtons(){
-    $('#code-sharing-box').html('<button class = "btn" id = "share-code" onclick="shareCode()">Share Code</button><br><br><button class = "btn" id = "connect" onclick="connect(false)">Connect</button>');
-}
-
-function closeSocket(){
-    socket.destroy();
-    backAllButtons();
-}
-
-function disconnect(){
-    app.close();
-    backAllButtons();
-}
-
-// end here
-
 
 // open update download section
 
@@ -1199,29 +1023,6 @@ function closeToDot(){
 }
 
 
-// update preview
-// editor.on("change", function() {
-    // clearTimeout(delay);
-
-    // auto save current file on change
-
-    // let last_session = fs.readFileSync('./last_session/info.json');  
-    // last_session = JSON.parse(last_session);
-    // fs.writeFile(last_session['#' + file.id].current_path, editor.getValue(), function(error){
-    //     if(error) throw error;
-    // });
-
-    // end here
-
-    // closeToDot();
-    // setTimeout(updateHtmlPreview, 300);
-    // setTimeout(updateMarkdownPreview, 300);
-    // updateHtmlPreview();
-    // updateMarkdownPreview();
-// });
-
-// Refresh Preview
-
 ipc.on('refreshPreview', function(event){
     updateHtmlPreview();
     updateMarkdownPreview();
@@ -1295,6 +1096,7 @@ function opentab(tab){
         // editor.refresh();
         setTimeout(function(){
             editor.refresh();
+            editor.focus();
         },1);
     }
 }

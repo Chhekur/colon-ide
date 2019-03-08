@@ -1,3 +1,5 @@
 ## Changelog
-- Fixed: Now you can stop running process, in case you run infinite process
-- Improved: Buffer size increased
+- Fixed: Colon only able to remember one unsaved file
+- Add: Colon remember you last working project
+- Fixed: Auto close when all tabs are closed
+- Fixed: Editor will auto focus when you create a new file
