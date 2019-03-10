@@ -1,6 +1,6 @@
 {
   "name": "Colon",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "A flexible text editor",
   "author": "Harendra Chhekur <820121223505e@gmail.com>",
   "main": "main.js",
@@ -23,6 +23,7 @@
     "localtunnel": "^1.9.1",
     "ps-tree": "^1.2.0",
     "showdown": "^1.8.6",
+    "simple-peer": "^9.2.1",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0"
   },

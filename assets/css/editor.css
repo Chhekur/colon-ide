@@ -313,6 +313,7 @@ input, button, textarea, :focus {
 }
 
 .btn{
+	min-width: 146px;
 	border:2px solid #ff3939;
 	outline: none;
 	background: none;

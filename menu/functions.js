@@ -35,6 +35,13 @@ ipc.on('openFileFromSidebar', function(event, filepath){
     openFileFromSidebar(filepath);
 })
 
+ipc.on('openRemoteFile', function (event, filepath){
+    fs.readFile(filepath, 'utf-8', function(err, data){
+        if(err) console.log(err);
+        else event.returnValue = {data:data, path:filepath, name:path.basename(filepath)};
+    });
+});
+
 function openDoubleClickFile(filepath){
     fs.readFile(filepath, 'utf-8', (err, data) => {
         if(err){
@@ -64,6 +71,11 @@ function openFile(){
         });
     });
 }
+
+ipc.on('getProjectPath', function(event){
+    event.returnValue = dialog.showOpenDialog(mainWindow, {properties: ['openDirectory']});
+})
+
 
 function openFolder(project_path){
 
@@ -103,6 +115,10 @@ ipc.on('openProjectFromLastSession', function(event, project_path){
 ipc.on('createDirectoryForSpecificDirpath', function(event, folderpath){
 	// console.log(dirTree(folderpath));
 	mainWindow.webContents.send('getDirectroyForSpecificDirpath', dirTree(folderpath));
+});
+
+ipc.on('getRemoteDirectoryForSpecificDirpath', function(event, folderpath){
+    event.returnValue = dirTree(folderpath);
 });
 
 function dirTree(filename) {
@@ -206,6 +222,17 @@ function copyTemplate(filepath){
 		return '';
 	}
 }
+
+ipc.on('saveRemoteFile', function(event, data, remote_path){
+    fs.writeFile(remote_path, data, function(error){
+        if(error) {
+            event.returnValue = false;
+            alert("An error ocurred creating the file "+ err.message);
+        }else{
+            event.returnValue = true;
+        }
+    });
+})
 
 ipc.on('save-data', function(event,data,filepath){
     // console.log(filepath);

@@ -9,7 +9,6 @@ const fs = require('fs');
 const markdown_converter = new showdown.Converter();
 const path = require('path');
 var files = {};
-var remoteFile;
 var newFileCount = 1;
 var download_progress;
 var userDataPath;
@@ -336,38 +335,39 @@ function openFolder(structure){
     openProjectStructure(true);
 
     last_session.openLastSessionFolders();
-    last_session.newLastSessionForProject(structure.path);
+    if(!code_sharing.remote_mode)
+        last_session.newLastSessionForProject(structure.path);
 }
 
 ipc.on('openFolder', function(event,structure){
+    code_sharing.remote_mode = false;
     openFolder(structure);
 });
 
 // create directory for specific Dirpath
 
-function createDirectoryForSpecificDirpath(folder){
-    // console.log(folder.getAttribute('data-path'));
-    // console.log($('#' + pathToId(folder.getAttribute('data-path'))).length);
-    // console.log($('#' + pathToId(folder.getAttribute('data-path'))).children());
-    
-    if($('#' + pathToId(folder.getAttribute('data-path'))).children().length == 0){
-        ipc.send('createDirectoryForSpecificDirpath', folder.getAttribute('data-path'));
+
+function createDirectoryForSpecificDirpath(folder, remote){
+    if(remote){
+        return ipc.sendSync('getRemoteDirectoryForSpecificDirpath', folder);
+    }else{
+        if(code_sharing.remote_mode){
+            code_sharing.getRemoteDirectoryForSpecificDirpath(folder.getAttribute('data-path'));
+        }else{
+            ipc.send('createDirectoryForSpecificDirpath', folder.getAttribute('data-path'));
+        }
     }
 }
 
 ipc.on('getDirectroyForSpecificDirpath', function(event, structure){
-    console.log('open')
-    // console.log(structure);
-    // console.log(structure.path);
-    // console.log(makeDirectoryTree(structure.children));
-    // console.log($('#' + structure.path.replace(/ /g, '_')));
-    // console.log($('#askdfhkjashdfkjasdf'))
-
-    $('#' + pathToId(structure.path)).html(makeDirectoryTree(structure.children));
-    $('#' + pathToId(structure.path)).filetree();
-    last_session.updateOpenFolderInProjectInfo(pathToId(structure.path));
-
+    openSpecificDirectory(structure);
 });
+
+function openSpecificDirectory(dir_structure){
+    $('#' + pathToId(dir_structure.path)).html(makeDirectoryTree(dir_structure.children));
+    $('#' + pathToId(dir_structure.path)).filetree();
+    last_session.updateOpenFolderInProjectInfo(pathToId(dir_structure.path));
+}
 // create tree structure for opened folder
 
 function makeDirectoryTree(structure){
@@ -384,10 +384,18 @@ function makeDirectoryTree(structure){
 }
 
 
-function openFileFromSidebar(file){
-    // console.log(file.getAttribute('data-path'));
-    let filepath = file.getAttribute('data-path');
-    ipc.send('openFileFromSidebar', filepath);
+function openFileFromSidebar(file, remote){
+    if(remote){
+        console.log(file);
+        return ipc.sendSync('openRemoteFile', file);
+    }else{
+        let filepath = file.getAttribute('data-path');
+        if(code_sharing.remote_mode){
+            code_sharing.openRemoteFile(filepath);
+        }else{
+            ipc.send('openFileFromSidebar', filepath);
+        }
+    }
 }
 
 // // copy template to new opened file
@@ -430,18 +438,25 @@ ipc.on('saveAs', function(event){
     }
 })
 
+
+function saveFile(data, filepath, remote){
+    //update file in last session end here
+    if(remote){
+        return ipc.sendSync('saveRemoteFile', data, filepath);
+    }else{
+        ipc.send('save-data', data, filepath);
+    }
+}
+
 ipc.on('save', function(event){
     if(editor != undefined){
-        var data = editor.getValue();
-        // console.log(data);
-
-        // update file in last session
-
+        let data = editor.getValue();
         last_session.changeLastSessionFilesContent(file.id, data);
-
-        //update file in last session end here
-
-        ipc.send('save-data', data, file.path);
+        if(file.remote_path){
+            code_sharing.saveRemoteFile(data, file.remote_path);
+        }else{
+            saveFile(data, file.path);
+        }
     }
 });
 
@@ -1111,64 +1126,3 @@ function openSettingsRightPanel(menu){
 }
 
 // end here
-
-
-
-// Tabs
-
-// (function($){  
-//     function initSecondaryCodeEditor(){
-//       var $active = $('#code_mirror_editors > .active > a');      
-//       var $sec_tab = $($active.data('target'));
-//       // --> 1. & 2. & 3.: try to find an already existing CodeMirror instance (https://github.com/codemirror/CodeMirror/issues/1413)
-//       // if found, simply refresh it!
-//       var codeMirrorContainer = $sec_tab.find(".CodeMirror")[0];
-//       if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-//       			// console.log('hello');
-// 				codeMirrorContainer.CodeMirror.refresh();
-//       } else {
-//       	console.log('Hello');
-//       	initEditor($sec_tab.find('textarea')[0]);
-//         // CodeMirror.fromTextArea($sec_tab.find('textarea')[0], {
-//         //   lineNumbers: true
-//         // });
-//       }
-//       // <--
-//     }
-
-//   $(document).ready(function(){
-
-//       $('#code_mirror_editors > li > a[data-toggle="tab"]').on('shown.bs.tab', function(e){
-//         // --> 1.: this might be called while the element is still invisible which breaks some CodeMirror calculations
-//         if ($(e.target).is(":visible")) {
-//           initSecondaryCodeEditor();
-//         }
-//         // <--
-//       });
-
-//       // Remember tabs
-//       var json, tabsState;
-//       $('a[data-toggle="tab"]').on('shown.bs.tab', function(e){
-//         tabsState = localStorage.getItem("tabs-state");
-//         json = JSON.parse(tabsState || "{}");
-//         json[$(e.target).parents("ul.nav.nav-pills, ul.nav.nav-tabs").attr("id")] = $(e.target).data('target');
-
-//         localStorage.setItem("tabs-state", JSON.stringify(json));
-//       });
-
-//       tabsState = localStorage.getItem("tabs-state");
-
-//       json = JSON.parse(tabsState || "{}");
-//       $.each(json, function(containerId, target) {
-//         return $("#" + containerId + " a[data-target=" + target + "]").tab('show');
-//       });
-
-//       $("ul.nav.nav-pills, ul.nav.nav-tabs").each(function() {
-//         var $this = $(this);
-//         if (!json[$this.attr("id")]) {
-//           return $this.find("a[data-toggle=tab]:first, a[data-toggle=pill]:first").tab("show");
-//           }
-//       });
-
-//     });// doc.ready
-//   })(jQuery);
