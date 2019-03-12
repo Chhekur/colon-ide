@@ -697,21 +697,19 @@ ipc.on('discordSettingsSaved', function(event){
 });
 
 
-// open about page
-
-ipc.on('openAbout', function(event){
-    if(isFileAlreadyOpened(path.join(__dirname, 'about.html'))){
-        $('#filename_'+getFileID(path.join(__dirname, 'about.html'))).click();
+function renderHTMLFileAndOpen(filename){
+	if(isFileAlreadyOpened(path.join(__dirname, filename))){
+        $('#filename_'+getFileID(path.join(__dirname, filename))).click();
     // console.log('jello');
     }else{
         newFileCount++;
         let file_id = "new" + newFileCount;
-        fs.readFile(path.join(__dirname, 'about.html'), function(err,data){
+        fs.readFile(path.join(__dirname, filename), function(err,data){
             if(err) console.log(err);
-            $('#code_mirror_editors').append('<li id = "file_tab_'+file_id+'"><a href="" data-target="#' + file_id + '" role="tab" data-toggle="tab"><span id = "filename_'+file_id+'" onclick = "opentab(this)">' + 'About' + '</span><span onclick = "closeAnyFile(this)" class="close black"></span></a></li>');
+            $('#code_mirror_editors').append('<li id = "file_tab_'+file_id+'"><a href="" data-target="#' + file_id + '" role="tab" data-toggle="tab"><span id = "filename_'+file_id+'" onclick = "opentab(this)">' + path.basename(filename) + '</span><span onclick = "closeAnyFile(this)" class="close black"></span></a></li>');
             $('#editors').append('<div class="tab-pane" id = "'+file_id+'">'+data+'</div>');
             files['#'+ file_id] = {
-                path: path.join(__dirname, 'about.html'),
+                path: path.join(__dirname, filename),
                 name: undefined,
                 id: file_id,
                 editor: undefined
@@ -719,6 +717,13 @@ ipc.on('openAbout', function(event){
             $('#filename_new'+newFileCount).click();
         });
     }
+}
+
+
+// open about page
+
+ipc.on('openAbout', function(event){
+    renderHTMLFileAndOpen('about.html')
 });
 
 // open console
