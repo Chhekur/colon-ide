@@ -706,7 +706,7 @@ function renderHTMLFileAndOpen(filename){
         let file_id = "new" + newFileCount;
         fs.readFile(path.join(__dirname, filename), function(err,data){
             if(err) console.log(err);
-            $('#code_mirror_editors').append('<li id = "file_tab_'+file_id+'"><a href="" data-target="#' + file_id + '" role="tab" data-toggle="tab"><span id = "filename_'+file_id+'" onclick = "opentab(this)">' + path.basename(filename) + '</span><span onclick = "closeAnyFile(this)" class="close black"></span></a></li>');
+            $('#code_mirror_editors').append('<li id = "file_tab_'+file_id+'"><a href="" data-target="#' + file_id + '" role="tab" data-toggle="tab"><span id = "filename_'+file_id+'" onclick = "opentab(this)">' + filename.split('.')[0] + '</span><span onclick = "closeAnyFile(this)" class="close black"></span></a></li>');
             $('#editors').append('<div class="tab-pane" id = "'+file_id+'">'+data+'</div>');
             files['#'+ file_id] = {
                 path: path.join(__dirname, filename),
@@ -926,6 +926,7 @@ function checkForUpdates(){
 }
 
 ipc.on('updateAvailable', function(event, version){
+    $('#update-badge').removeClass('hide');
     $('#update-section-box').empty();
     $('#update-section-box').append('<p id = "update-version">Update Available ' + version + '</p><br>');
     $('#update-section-box').append('<button id = "download-button" class="btn" onclick = "downloadUpdate()">Download</button>');
@@ -940,6 +941,7 @@ function downloadUpdate(){
 }
 
 ipc.on('updateNotAvailable', function(event){
+    $('#update-badge').addClass('hide');
     $('#check-for-update').remove();
     $('#update-section-box').append('<p>Current version is up-to-date.</p>');
 

@@ -127,7 +127,7 @@ input, button, textarea, :focus {
 
 #project-structure{
 	overflow: auto;
-	height: 100%;
+	height: calc(100% - 33px);
 }
 
 .panel-left {
@@ -468,4 +468,15 @@ input, button, textarea, :focus {
 }
 .show{
 	display: block;
+}
+
+.custom-badge {
+	top:0;
+	color:#ff3939;
+	left:20px;
+	font-size: 20px;
+    line-height: 28px;
+    vertical-align: middle;
+    text-align: center;
+    position: absolute;
 }
