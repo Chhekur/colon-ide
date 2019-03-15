@@ -1054,14 +1054,11 @@ ipc.on('refreshPreview', function(event){
 
 function updateHtmlPreview() {
     if(editor != undefined){
-        var previewFrame = document.getElementById('html-preview');
-        var preview =  previewFrame.contentDocument ||  previewFrame.contentWindow.document;
-        preview.open();
-        // console.log(editor.getValue());
-        preview.write(editor.getValue());
-        preview.close();
+        saveFile(editor.getValue(), file.path)
+        $('#html-preview').attr('src',`file:///${file.path}`);
     }
 }
+
 function updateMarkdownPreview(){
     if(editor != undefined){
         var previewFrame = document.getElementById('markdown-preview');
@@ -1072,9 +1069,6 @@ function updateMarkdownPreview(){
         preview.close();
     }
 }
-
-// setTimeout(updateHtmlPreview, 300);
-// setTimeout(updateMarkdownPreview, 300);
 
 // Increase or Decrease font size
 
@@ -1106,8 +1100,8 @@ function opentab(tab){
     // console.log(tab);
     file = files[$(tab).parent().data('target')];
     editor = file.editor;
-    updateHtmlPreview();
-    updateMarkdownPreview();
+    // updateHtmlPreview();
+    // updateMarkdownPreview();
     // editor.on("change", function() {
     // 	closeToDot();
     // 	// clearTimeout(delay);
