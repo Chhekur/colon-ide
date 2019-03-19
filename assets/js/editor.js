@@ -1,6 +1,8 @@
 const code_sharing = require('../assets/js/code_sharing.js');
 const last_session = require('../assets/js/last_session.js');
 
+// require('../node_modules/xterm/lib/addons/fullscreen.js');
+
 const ipc = require('electron').ipcRenderer;
 const {dialog} = require('electron').remote;
 window.$ = window.jQuery = require('../assets/js/jquery.js');
@@ -572,6 +574,7 @@ setInterval(function(){
         $('#footer_' + file['id'] ).find('#mode').html(temp);
         // document.getElementById('mode').innerHTML = temp ;
     }
+    xterm.fit();
 },100);
 
 // trigger left side-bar
@@ -726,19 +729,20 @@ ipc.on('openAbout', function(event){
     renderHTMLFileAndOpen('about.html')
 });
 
-// open console
-function openConsole(){
+// open Terminal
+
+function openTerminal(){
     if($('.settings-panel').css('display') != 'none'){
         openSettingsPanel();
         editor.refresh();
     }
-    if($('.console-container').css('display') == 'none'){
-        $('.panel-middle').css('width','60%');
-        $('.console-container').css('display','block');
+    if($('.terminal-container').css('display') == 'none'){
+        $('.panel-middle').css('width', '60%');
+        $('.terminal-container').css('display', 'block');
         $('.fa-terminal').addClass('side-nav-button-active');
     }else{
         $('.panel-middle').css('width','100%');
-        $('.console-container').css('display','none');
+        $('.terminal-container').css('display','none');
         $('.fa-terminal').removeClass('side-nav-button-active');
     }
     $('.html-preview').css('display','none');
@@ -751,6 +755,37 @@ function openConsole(){
     $('.fa-cog').removeClass('side-nav-button-active');
     $('.code-sharing-panel').css('display','none');
     $('.fa-share-square-o').removeClass('side-nav-button-active');
+    $('.console-container').css('display', 'none');
+    $('.fa-play').removeClass('side-nav-button-active');
+}
+
+// open console
+function openConsole(){
+    if($('.settings-panel').css('display') != 'none'){
+        openSettingsPanel();
+        editor.refresh();
+    }
+    if($('.console-container').css('display') == 'none'){
+        $('.panel-middle').css('width','60%');
+        $('.console-container').css('display','block');
+        $('.fa-play').addClass('side-nav-button-active');
+    }else{
+        $('.panel-middle').css('width','100%');
+        $('.console-container').css('display','none');
+        $('.fa-play').removeClass('side-nav-button-active');
+    }
+    $('.html-preview').css('display','none');
+    $('.fa-television').removeClass('side-nav-button-active');
+    $('.markdown-preview').css('display','none');
+    $('.fa-desktop').removeClass('side-nav-button-active');
+    $('.update-download-section').css('display','none');
+    $('.fa-download').removeClass('side-nav-button-active');
+    $('.settings-panel').css('display', 'none');
+    $('.fa-cog').removeClass('side-nav-button-active');
+    $('.code-sharing-panel').css('display','none');
+    $('.fa-share-square-o').removeClass('side-nav-button-active');
+    $('.terminal-container').css('display', 'none');
+    $('.fa-terminal').removeClass('side-nav-button-active');
 }
 
 ipc.on('openConsole',function(event){
@@ -783,6 +818,8 @@ function openHtmlPreview(){
     $('.fa-cog').removeClass('side-nav-button-active');
     $('.code-sharing-panel').css('display','none');
     $('.fa-share-square-o').removeClass('side-nav-button-active');
+    $('.terminal-container').css('display', 'none');
+    $('.fa-terminal').removeClass('side-nav-button-active');
 }
 
 ipc.on('openHtmlPreview', function(event){
@@ -837,6 +874,8 @@ function openSettingsPanel(){
     $('.fa-download').removeClass('side-nav-button-active');
     $('.code-sharing-panel').css('display','none');
     $('.fa-share-square-o').removeClass('side-nav-button-active');
+    $('.terminal-container').css('display', 'none');
+    $('.fa-terminal').removeClass('side-nav-button-active');
     editor.refresh();
 }
 
@@ -868,6 +907,8 @@ function openCodeSharingPanel(){
     $('.fa-cog').removeClass('side-nav-button-active');
     $('.update-download-section').css('display','none');
     $('.fa-download').removeClass('side-nav-button-active');
+    $('.terminal-container').css('display', 'none');
+    $('.fa-terminal').removeClass('side-nav-button-active');
 }
 
 // end here
@@ -908,6 +949,8 @@ function openUpdateDownloadSection(){
     $('.fa-cog').removeClass('side-nav-button-active');
     $('.code-sharing-panel').css('display','none');
     $('.fa-share-square-o').removeClass('side-nav-button-active');
+    $('.terminal-container').css('display', 'none');
+    $('.fa-terminal').removeClass('side-nav-button-active');
 }
 
 
@@ -996,6 +1039,8 @@ function openMarkdownPreview(){
     $('.fa-cog').removeClass('side-nav-button-active');
     $('.code-sharing-panel').css('display','none');
     $('.fa-share-square-o').removeClass('side-nav-button-active');
+    $('.terminal-container').css('display', 'none');
+    $('.fa-terminal').removeClass('side-nav-button-active');
 }
 
 ipc.on('openMarkdownPreview', function(event){
@@ -1127,3 +1172,5 @@ function openSettingsRightPanel(menu){
 }
 
 // end here
+
+require('../assets/js/terminal.js')

@@ -13,6 +13,7 @@
 	<link rel="stylesheet" href="../assets/css/bootstrap.css">
 	<link rel="stylesheet" href="../assets/css/metro.css">
 	<link rel="stylesheet" href="../assets/css/loading-bar.css">
+	<link rel="Stylesheet" href="../node_modules/xterm/lib/xterm.css">
 	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
 	<script src = "../src/editor/lib/codemirror.js"></script>
 	<!-- <script src = "../src/editor/mode/javascript/javascript.js"></script> -->
@@ -70,6 +71,9 @@
 				<span class="icon"><i class="fa fa-folder-o" aria-hidden="true" ></i></span>
 			</a></li>
 			<li><a href="#" onclick = "openConsole()" title = "Console">
+				<span class="icon"><i class="fa fa-play" aria-hidden="true" ></i></span>
+			</a></li>
+			<li><a href="#" onclick = "openTerminal()" title = "Terminal">
 				<span class="icon"><i class="fa fa-terminal" aria-hidden="true" ></i></span>
 			</a></li>
 			<li><a href="#" onclick = "openHtmlPreview()" title = "Html Preview">
@@ -82,11 +86,11 @@
 				<span class="icon"><i class="fa fa-download" aria-hidden="true" ></i></span>
 				<span id = "update-badge" class="custom-badge hide">➊</span>
 			</a></li>
-			<li><a href="#" onclick = "openSettingsPanel()" title = "Settings">
-				<span class="icon"><i class="fa fa-cog" aria-hidden="true" ></i></span>
-			</a></li>
 			<li><a href="#" onclick = "openCodeSharingPanel()" title = "Code Sharing">
 				<span class="icon"><i class="fa fa-share-square-o" aria-hidden="true" ></i></span>
+			</a></li>
+			<li><a href="#" onclick = "openSettingsPanel()" title = "Settings">
+				<span class="icon"><i class="fa fa-cog" aria-hidden="true" ></i></span>
 			</a></li>
 		</ul>
 	</div>
@@ -130,6 +134,12 @@
 			<div><span>Output</span><br><br>
 				<span id = "output" class="console"></span>
 			</div>
+		</div>
+
+		<!-- terminal -->
+		
+		<div class = "terminal-container">
+			<div id="terminal"></div>	
 		</div>
 
 		<div class = "html-preview">

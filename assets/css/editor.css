@@ -180,8 +180,6 @@ input, button, textarea, :focus {
 	min-height: 200px;
 	min-width: 200px;
 	/*white-space: nowrap;*/
-	/*background: #21252b;*/
-	/*color: #9da5b4;*/
 }
 
 .console-container{
@@ -236,6 +234,13 @@ input, button, textarea, :focus {
 	width: 100%;
 	height: 100%;
 	/*border: none;*/
+}
+
+.terminal-container{
+	position: relative;
+	/* display: none; */
+	width: 100%;
+	height: 100%;
 }
 
 .centered-box{
