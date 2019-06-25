@@ -1,6 +1,7 @@
 var os = require('os');
 var pty = require('node-pty');
 var Terminal = require('xterm').Terminal;
+var fs = require('fs');
 let fit = require('../../node_modules/xterm/lib/addons/fit/fit.js');
 
 // Initialize node-pty with an appropriate shell
@@ -11,7 +12,8 @@ const ptyProcess = pty.spawn(shell, [], {
   name: 'xterm-color',
 //   cols: 10,
 //   rows: 500,
-  cwd: (file.path != undefined) ? path.join(file.path, '..') : process.env.HOME,
+  cwd: ((file.path != undefined) && (fs.existsSync(file.path))) ? path.join(file.path, '..') : process.env.HOME,
+  // cwd: '.',
   env: process.env
 });
 console.log(file.path);
