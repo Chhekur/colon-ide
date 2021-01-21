@@ -26,7 +26,7 @@
     "ps-tree": "^1.2.0",
     "showdown": "^1.8.6",
     "simple-peer": "^9.2.1",
-    "socket.io": "^2.2.0",
+    "socket.io": "^2.4.0",
     "socket.io-client": "^2.2.0",
     "xterm": "^3.12.0"
   },
