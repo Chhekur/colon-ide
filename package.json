@@ -14,7 +14,7 @@
   "keywords": [],
   "license": "ISC",
   "devDependencies": {
-    "electron": "2.0.8",
+    "electron": "18.3.7",
     "electron-rebuild": "^1.8.4"
   },
   "dependencies": {
